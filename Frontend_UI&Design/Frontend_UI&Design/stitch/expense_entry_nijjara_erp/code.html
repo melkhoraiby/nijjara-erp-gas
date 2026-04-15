@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NIJJARA - تسجيل المصروفات</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;400;500;700;900&amp;family=Inter:wght@300;400;600&amp;family=Manrope:wght@600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-container": "#b6b8be",
+              "outline": "#9a8f80",
+              "on-tertiary-fixed": "#1a1c1c",
+              "surface-dim": "#131314",
+              "secondary-fixed-dim": "#c4c6cc",
+              "secondary-fixed": "#e0e2e8",
+              "primary-container": "#c5a059",
+              "outline-variant": "#4e4639",
+              "on-primary-container": "#4e3700",
+              "on-tertiary-container": "#393b3b",
+              "on-error-container": "#ffdad6",
+              "on-surface": "#e5e2e3",
+              "inverse-on-surface": "#313031",
+              "surface-variant": "#353436",
+              "on-background": "#e5e2e3",
+              "secondary": "#c4c6cc",
+              "surface-tint": "#e9c176",
+              "tertiary-fixed": "#e2e2e2",
+              "on-surface-variant": "#d1c5b4",
+              "surface-bright": "#3a393a",
+              "surface-container-low": "#1c1b1c",
+              "surface": "#131314",
+              "background": "#131314",
+              "on-primary-fixed": "#261900",
+              "surface-container": "#201f20",
+              "primary-fixed-dim": "#e9c176",
+              "on-error": "#690005",
+              "on-primary": "#412d00",
+              "on-secondary-fixed-variant": "#44474b",
+              "error": "#ffb4ab",
+              "surface-container-high": "#2a2a2b",
+              "inverse-primary": "#775a19",
+              "primary": "#e9c176",
+              "primary-fixed": "#ffdea5",
+              "on-secondary": "#2d3135",
+              "surface-container-highest": "#353436",
+              "surface-container-lowest": "#0e0e0f",
+              "secondary-container": "#46494e",
+              "error-container": "#93000a",
+              "on-tertiary-fixed-variant": "#454747",
+              "tertiary-container": "#a4a5a5",
+              "inverse-surface": "#e5e2e3",
+              "on-primary-fixed-variant": "#5d4201",
+              "on-secondary-fixed": "#181c20",
+              "tertiary": "#c6c6c7",
+              "on-tertiary": "#2f3131",
+              "tertiary-fixed-dim": "#c6c6c7"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "Cairo"],
+              "body": ["Inter", "Cairo"],
+              "label": ["Inter", "Cairo"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Cairo', sans-serif; }
+        .glass-panel {
+            background: rgba(32, 31, 32, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(229, 226, 227, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary/30 min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 right-0 w-full z-50 flex items-center justify-between px-6 h-16 flex-row-reverse bg-[#131314]/80 backdrop-blur-xl border-b border-[#e5e2e3]/15 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+<div class="flex items-center gap-6">
+<div class="text-[#e9c176] font-['Cairo'] font-bold text-lg tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span>تسجيل المصروفات التشغيلية</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[#c4c6cc]/10 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-secondary" data-icon="search">search</span>
+<span class="material-symbols-outlined text-secondary" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-secondary" data-icon="apps">apps</span>
+</div>
+<div class="h-8 w-8 rounded-full bg-surface-container-high border border-outline-variant/30 overflow-hidden">
+<img alt="User Profile Avatar" data-alt="Professional portrait of a male executive in dark attire, dramatic cinematic lighting, deep shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5lc42K3F4LFW0gwK-jr6UVeTsw7uNL5VXRdeTlZQ--SHF8tHiqcY001wX2tFxla-THUrPydne0BBjX-KUx1-oO9iwZepnG5_kA9teY_K3g9SZhvsG8yFWdmmHmuyKtdJhoA9waFYIshMmFcEsVE1RWHm1ObdkMLzqJ60LuXGS0L7iNqX7dC8yl9njkfixwItGmsIzukhE7d9E_D2Iba_xxLbA-y-qZb13Z4uK5lqxa7RYucNEmLqHvNfdjb4hyTOLeAH3hSc_q_I"/>
+</div>
+<span class="text-2xl font-black text-[#e9c176] tracking-widest ml-4">NIJJARA</span>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed right-0 top-0 h-screen w-64 border-l border-[#e5e2e3]/15 bg-[#131314] surface_container_low backdrop-blur-lg shadow-2xl flex flex-col h-full pt-20 pb-6 text-right z-40 hidden md:flex">
+<div class="px-6 mb-8">
+<div class="flex items-center justify-end gap-3 mb-2">
+<div>
+<h3 class="text-[#e9c176] font-bold font-['Cairo'] text-base">المؤسسة</h3>
+<p class="text-[#c4c6cc]/60 text-xs">نظام إدارة الموارد</p>
+</div>
+<div class="h-10 w-10 bg-primary/10 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="diamond" style="font-variation-settings: 'FILL' 1;">diamond</span>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center justify-end gap-3 px-6 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 hover:translate-x-[-4px] transition-all" href="#">
+<span>لوحة القيادة</span>
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+</a>
+<a class="flex items-center justify-end gap-3 px-6 py-3 bg-gradient-to-l from-[#e9c176]/20 to-transparent text-[#e9c176] border-r-4 border-[#e9c176] font-medium" href="#">
+<span>المالية</span>
+<span class="material-symbols-outlined" data-icon="payments" style="font-variation-settings: 'FILL' 1;">payments</span>
+</a>
+<a class="flex items-center justify-end gap-3 px-6 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 hover:translate-x-[-4px] transition-all" href="#">
+<span>المشاريع</span>
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+</a>
+<a class="flex items-center justify-end gap-3 px-6 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 hover:translate-x-[-4px] transition-all" href="#">
+<span>الموارد البشرية</span>
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+</a>
+<a class="flex items-center justify-end gap-3 px-6 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 hover:translate-x-[-4px] transition-all" href="#">
+<span>العملاء</span>
+<span class="material-symbols-outlined" data-icon="handshake">handshake</span>
+</a>
+</nav>
+<div class="px-6 mt-auto space-y-1">
+<a class="flex items-center justify-end gap-3 px-4 py-2 text-[#c4c6cc]/60 hover:text-[#e5e2e3] transition-colors" href="#">
+<span class="text-xs">الإعدادات</span>
+<span class="material-symbols-outlined text-sm" data-icon="settings">settings</span>
+</a>
+<a class="flex items-center justify-end gap-3 px-4 py-2 text-error/60 hover:text-error transition-colors" href="#">
+<span class="text-xs">تسجيل الخروج</span>
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:mr-64 pt-24 pb-16 px-6 lg:px-12">
+<div class="max-w-5xl mx-auto">
+<!-- Header Section -->
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<nav class="flex items-center gap-2 text-secondary/50 text-sm mb-2">
+<span>المالية</span>
+<span class="material-symbols-outlined text-xs" data-icon="chevron_left">chevron_left</span>
+<span class="text-primary/70">طلب صرف جديد</span>
+</nav>
+<h1 class="text-4xl font-black font-headline text-on-surface tracking-tight">إدخال مصروف تشغيلي</h1>
+<p class="text-secondary/60 mt-2 max-w-md">يرجى ملء كافة البيانات المطلوبة بدقة لضمان سرعة دورة الاعتماد المالي.</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-6 py-2.5 rounded-lg border border-outline-variant/30 text-secondary hover:bg-surface-container-high transition-all">
+                        حفظ كمسودة
+                    </button>
+<button class="px-8 py-2.5 rounded-lg bg-gradient-to-br from-primary to-primary-container text-on-primary-container font-bold shadow-lg shadow-primary/10 hover:brightness-110 transition-all flex items-center gap-2">
+<span>إرسال للاعتماد</span>
+<span class="material-symbols-outlined text-sm" data-icon="send">send</span>
+</button>
+</div>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left Column: Primary Form Fields -->
+<div class="lg:col-span-2 space-y-8">
+<!-- Section 1: Classification -->
+<section class="glass-panel p-8 rounded-xl">
+<div class="flex items-center gap-3 mb-8 border-r-4 border-primary pr-4">
+<h2 class="text-xl font-bold">تصنيف المصروف</h2>
+<span class="text-secondary/40 text-xs">— تحديد النوع والقناة</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-sm font-medium text-secondary/80 mr-1">نوع المصروف</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 focus:border-primary/40 focus:ring-0 text-on-surface transition-all appearance-none">
+<option>Direct (مباشر)</option>
+<option>Indirect Periodical (غير مباشر دوري)</option>
+<option>Indirect Non-Periodical (غير مباشر غير دوري)</option>
+<option>Asset (أصل ثابت)</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-secondary/80 mr-1">قناة التخصيص</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 focus:border-primary/40 focus:ring-0 text-on-surface transition-all">
+<option>Project (مشروع)</option>
+<option>Factory Rental (إيجار المصنع)</option>
+<option>&amp;Pieces Showroom (معرض آند بيسز)</option>
+<option>Factory (المصنع)</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-secondary/80 mr-1">التصنيف الرئيسي</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 focus:border-primary/40 focus:ring-0 text-on-surface transition-all">
+<option>مهمات مكتبية</option>
+<option>صيانة وإصلاح</option>
+<option>نثريات ومشتريات</option>
+<option>أجور وتعويضات</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-secondary/80 mr-1">التصنيف الفرعي</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 focus:border-primary/40 focus:ring-0 text-on-surface transition-all">
+<option>أدوات قرطاسية</option>
+<option>تجهيزات ورش</option>
+<option>قطع غيار ماكينات</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Section 2: Financial Details -->
+<section class="glass-panel p-8 rounded-xl">
+<div class="flex items-center gap-3 mb-8 border-r-4 border-primary pr-4">
+<h2 class="text-xl font-bold">التفاصيل المالية</h2>
+<span class="text-secondary/40 text-xs">— القيمة والجهة المستلمة</span>
+</div>
+<div class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-sm font-medium text-secondary/80 mr-1">المبلغ (ج.م)</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 focus:border-primary/40 focus:ring-0 text-on-surface text-2xl font-bold font-headline" placeholder="0.00" type="number"/>
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-bold">EGP</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-secondary/80 mr-1">تاريخ المصروف</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 focus:border-primary/40 focus:ring-0 text-on-surface" type="date"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-secondary/80 mr-1">الجهة المستفيدة / المورد</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 focus:border-primary/40 focus:ring-0 text-on-surface" placeholder="اسم الشركة أو الشخص المستلم..." type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-secondary/80 mr-1">ملاحظات إضافية</label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 focus:border-primary/40 focus:ring-0 text-on-surface resize-none" placeholder="وصف تفصيلي لسبب الصرف..." rows="3"></textarea>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Secondary Data & Attachments -->
+<div class="space-y-8">
+<!-- Custody Selection -->
+<section class="glass-panel p-6 rounded-xl">
+<div class="flex items-center gap-2 mb-4 text-primary">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+<h3 class="font-bold">جهة العهدة</h3>
+</div>
+<div class="space-y-4">
+<label class="block text-xs font-bold text-secondary/40 uppercase tracking-wider">اختيار المسؤول عن العهدة</label>
+<select class="w-full bg-surface-container border border-outline-variant/20 rounded-lg px-4 py-3 text-on-surface focus:border-primary/40 focus:ring-0">
+<option>م. أحمد السيد - عهدة تشغيلية</option>
+<option>أ. سارة محمود - نثريات المكتب</option>
+<option>م. إبراهيم حسن - عهدة موقع</option>
+<option>خزينة المصنع الرئيسية</option>
+</select>
+<div class="bg-primary/5 p-4 rounded border border-primary/10">
+<p class="text-xs text-secondary/70 leading-relaxed">الرصيد المتبقي في العهدة المختارة سيتم تحديثه فور الموافقة على هذا الطلب.</p>
+</div>
+</div>
+</section>
+<!-- File Upload Experience -->
+<section class="glass-panel p-6 rounded-xl border-dashed border-outline-variant/30">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-secondary" data-icon="attachment">attachment</span>
+<h3 class="font-bold">المرفقات والوثائق</h3>
+</div>
+<div class="group relative flex flex-col items-center justify-center border-2 border-dashed border-outline-variant/20 rounded-xl p-8 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer">
+<input class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
+<div class="h-16 w-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl text-secondary" data-icon="upload_file">upload_file</span>
+</div>
+<p class="text-sm font-bold text-on-surface mb-1">اسحب وأفلت الفواتير هنا</p>
+<p class="text-xs text-secondary/50">يدعم PDF, JPG, PNG (حد أقصى 10MB)</p>
+</div>
+<div class="mt-4 space-y-2">
+<!-- Placeholder for uploaded file -->
+<div class="flex items-center justify-between p-3 bg-surface-container-highest/30 rounded-lg border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="description">description</span>
+<div class="text-xs">
+<p class="text-on-surface font-medium">فاتورة_توريد_خامات.pdf</p>
+<p class="text-secondary/40">1.2 MB</p>
+</div>
+</div>
+<button class="text-secondary/40 hover:text-error transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="close">close</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Summary Card -->
+<section class="bg-primary/10 p-6 rounded-xl border border-primary/20">
+<h3 class="text-primary font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+                            ملخص المعاملة
+                        </h3>
+<div class="space-y-3 text-sm">
+<div class="flex justify-between">
+<span class="text-secondary/60">القيمة الأساسية:</span>
+<span class="text-on-surface font-headline">0.00 ج.م</span>
+</div>
+<div class="flex justify-between">
+<span class="text-secondary/60">ضريبة القيمة المضافة:</span>
+<span class="text-on-surface font-headline">0.00 ج.م</span>
+</div>
+<div class="h-px bg-outline-variant/20 my-2"></div>
+<div class="flex justify-between text-base font-black">
+<span class="text-primary">الإجمالي النهائي:</span>
+<span class="text-primary font-headline">0.00 ج.م</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 right-64 left-0 h-10 border-t border-[#e5e2e3]/5 bg-[#131314] flex justify-between items-center px-8 flex-row-reverse z-50 text-[#c4c6cc] font-['Inter'] text-[11px] uppercase tracking-wider hidden md:flex">
+<div class="flex items-center gap-4">
+<span>الجلسة الحالية: 02:45</span>
+<span class="w-1 h-1 bg-primary rounded-full"></span>
+<span>حالة النظام: مستقر</span>
+</div>
+<div class="flex items-center gap-6">
+<p>© 2024 نيجارة. جميع الحقوق محفوظة.</p>
+</div>
+</footer>
+</body></html>

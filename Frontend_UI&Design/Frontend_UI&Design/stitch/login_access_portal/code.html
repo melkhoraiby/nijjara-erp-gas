@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NIJJARA - بوابة تسجيل الدخول</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&amp;family=Inter:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline": "#9a8f80",
+              "on-secondary": "#2d3135",
+              "tertiary": "#c6c6c7",
+              "on-tertiary-fixed-variant": "#454747",
+              "on-tertiary-container": "#393b3b",
+              "on-primary-fixed-variant": "#5d4201",
+              "error-container": "#93000a",
+              "background": "#131314",
+              "on-secondary-fixed": "#181c20",
+              "primary-fixed": "#ffdea5",
+              "inverse-primary": "#775a19",
+              "primary-fixed-dim": "#e9c176",
+              "surface-tint": "#e9c176",
+              "on-background": "#e5e2e3",
+              "surface-container": "#201f20",
+              "on-tertiary": "#2f3131",
+              "surface-container-low": "#1c1b1c",
+              "on-surface": "#e5e2e3",
+              "secondary-fixed-dim": "#c4c6cc",
+              "tertiary-fixed-dim": "#c6c6c7",
+              "tertiary-container": "#a4a5a5",
+              "on-tertiary-fixed": "#1a1c1c",
+              "surface": "#131314",
+              "on-primary": "#412d00",
+              "tertiary-fixed": "#e2e2e2",
+              "surface-variant": "#353436",
+              "surface-container-high": "#2a2a2b",
+              "on-error": "#690005",
+              "on-surface-variant": "#d1c5b4",
+              "on-primary-container": "#4e3700",
+              "surface-container-lowest": "#0e0e0f",
+              "inverse-surface": "#e5e2e3",
+              "primary": "#e9c176",
+              "outline-variant": "#4e4639",
+              "on-secondary-fixed-variant": "#44474b",
+              "on-error-container": "#ffdad6",
+              "surface-container-highest": "#353436",
+              "error": "#ffb4ab",
+              "secondary-container": "#46494e",
+              "on-primary-fixed": "#261900",
+              "secondary-fixed": "#e0e2e8",
+              "surface-dim": "#131314",
+              "surface-bright": "#3a393a",
+              "inverse-on-surface": "#313031",
+              "primary-container": "#c5a059",
+              "on-secondary-container": "#b6b8be",
+              "secondary": "#c4c6cc"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "Cairo"],
+              "body": ["Inter", "Cairo"],
+              "label": ["Inter", "Cairo"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .glass-card {
+        background: rgba(32, 31, 32, 0.6);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(233, 193, 118, 0.1);
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Cairo', sans-serif;
+        background: radial-gradient(circle at top right, #2a2a2b 0%, #131314 100%);
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col items-center justify-center p-6 selection:bg-primary/30">
+<!-- Background Decorative Elements -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none">
+<div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px]"></div>
+</div>
+<!-- Main Content Shell -->
+<main class="w-full max-w-[1200px] grid md:grid-cols-12 gap-8 items-center z-10">
+<!-- Left Side: Editorial Context (Web only) -->
+<div class="hidden md:flex md:col-span-6 flex-col gap-8 text-right p-8">
+<div class="space-y-4">
+<span class="text-primary font-headline tracking-[0.3em] text-sm font-bold uppercase">Nijjara Intelligence</span>
+<h1 class="text-6xl font-headline font-black text-on-surface leading-tight">
+                    إدارة <span class="text-primary">السيادة</span><br/>الرقمية
+                </h1>
+<p class="text-on-surface-variant text-lg leading-relaxed max-w-md mr-0 ml-auto">
+                    نظام متطور لإدارة الموارد المؤسسية يجمع بين الذكاء الاصطناعي والأمان الفائق لتجربة إدارية استثنائية.
+                </p>
+</div>
+<div class="flex gap-4 mt-8">
+<div class="p-4 rounded-xl surface-container-low border border-outline-variant/10 flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">verified_user</span>
+<div class="text-right">
+<div class="text-sm font-bold">تشفير سيادي</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-tighter">End-to-End Governance</div>
+</div>
+</div>
+<div class="p-4 rounded-xl surface-container-low border border-outline-variant/10 flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">language</span>
+<div class="text-right">
+<div class="text-sm font-bold">وصول عالمي</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Unified Operations</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Login Portal -->
+<div class="md:col-span-6 flex flex-col items-center">
+<div class="w-full max-w-[480px] glass-card rounded-xl shadow-[0_40px_100px_rgba(0,0,0,0.5)] p-10 relative overflow-hidden">
+<!-- Brand Anchor -->
+<div class="flex flex-col items-center mb-10 gap-2">
+<div class="w-16 h-16 rounded-lg bg-gradient-to-br from-primary to-primary-container flex items-center justify-center mb-4 shadow-lg shadow-primary/20">
+<span class="text-on-primary font-black text-3xl tracking-widest">N</span>
+</div>
+<h2 class="text-2xl font-bold tracking-widest text-primary">NIJJARA</h2>
+<p class="text-on-surface-variant text-xs font-label uppercase tracking-[0.2em]">Sovereign ERP Portal</p>
+</div>
+<!-- Tabs -->
+<div class="flex border-b border-outline-variant/15 mb-8">
+<button class="flex-1 pb-4 text-sm font-bold text-primary border-b-2 border-primary transition-all">تسجيل الدخول</button>
+<button class="flex-1 pb-4 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all">إنشاء حساب</button>
+<button class="flex-1 pb-4 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all">استعادة كلمة المرور</button>
+</div>
+<!-- Form -->
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="block text-right text-xs font-bold text-on-surface-variant mr-1">رقم الموظف أو البريد الإلكتروني</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3.5 text-right focus:outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all" placeholder="E-123456" type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-3.5 text-on-surface-variant/40">person</span>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center px-1">
+<a class="text-[10px] text-primary hover:underline transition-all" href="#">هل نسيت كلمة المرور؟</a>
+<label class="block text-right text-xs font-bold text-on-surface-variant">كلمة المرور</label>
+</div>
+<div class="relative group">
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3.5 text-right focus:outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all" placeholder="••••••••" type="password"/>
+<span class="material-symbols-outlined absolute left-4 top-3.5 text-on-surface-variant/40">lock</span>
+</div>
+</div>
+<!-- CTA -->
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-bold py-4 rounded-lg shadow-xl shadow-primary/10 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3" type="submit">
+<span>الدخول إلى النظام</span>
+<span class="material-symbols-outlined text-xl">login</span>
+</button>
+<div class="relative flex items-center py-4">
+<div class="flex-grow border-t border-outline-variant/10"></div>
+<span class="flex-shrink mx-4 text-[10px] text-on-surface-variant uppercase tracking-widest">تأمين مزدوج</span>
+<div class="flex-grow border-t border-outline-variant/10"></div>
+</div>
+<!-- Create Account Trigger (Base Data Check View) -->
+<div class="bg-surface-container-low/50 rounded-xl p-6 border border-outline-variant/5">
+<h3 class="text-xs font-bold text-primary mb-3">التحقق من بيانات الموظف الأساسية</h3>
+<p class="text-[10px] text-on-surface-variant mb-4 leading-relaxed">لبدء عملية إنشاء الحساب، يرجى إدخال الرقم الوظيفي المسجل في قاعدة بيانات الموارد البشرية.</p>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-secondary/10 text-secondary text-xs font-bold rounded-md hover:bg-secondary/20 transition-all">تحقق</button>
+<input class="flex-1 bg-surface-container-lowest border border-outline-variant/20 rounded-md px-3 py-2 text-xs text-right focus:outline-none focus:border-primary/40" placeholder="رقم الهوية / الإقامة" type="text"/>
+</div>
+</div>
+</form>
+</div>
+</div>
+</main>
+<!-- Footer: System Status -->
+<footer class="fixed bottom-0 left-0 right-0 h-14 bg-surface/80 backdrop-blur-md border-t border-outline-variant/5 flex items-center justify-between px-12 z-20">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+<span class="text-[10px] font-label text-on-surface-variant uppercase tracking-widest">System Online</span>
+</div>
+<div class="h-4 w-[1px] bg-outline-variant/20"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-on-surface-variant">terminal</span>
+<span class="text-[10px] font-label text-on-surface-variant">v2.4.0-STABLE</span>
+</div>
+</div>
+<div class="flex items-center gap-8 flex-row-reverse">
+<div class="flex flex-col items-end">
+<span class="text-xs font-bold text-on-surface">الثلاثاء، 24 مايو 2024</span>
+<span class="text-[9px] text-on-surface-variant font-label uppercase tracking-tighter">Islamic Calendar Support Enabled</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant/20"></div>
+<div class="flex flex-col items-end">
+<span class="text-lg font-black text-primary leading-none">09:45:12</span>
+<span class="text-[9px] text-on-surface-variant font-label uppercase">GMT +3</span>
+</div>
+</div>
+</footer>
+<!-- Decorative Illustration Background (Abstract) -->
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none mix-blend-overlay">
+<div class="absolute inset-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAKKHHcvgQoYJxsmiUOw3f1oZDR011pu9rpyO_GZ8eyXj3p5cZH50H0yq1VJBqCHgK_qJ5zTB2OuNYOep9YeT4a2RF4iP9_SFIUTk0EIPnFye6p5qMj_cbAw95PlfBE81PuMgsU8b5AEklaJyVkME8hxU0ANE-xHbV3FDRaDXgL2lC4mivvqh7tizAmGqdcZq00_0X-mJoRxVqaM7qD7ij1uiEXfA4Oqe9KQmsm1UObyp_LlvcD8iIVhMiU_ubmvgoHbG3oUohQdX0');"></div>
+</div>
+<img alt="abstract digital connection network" class="fixed inset-0 w-full h-full object-cover opacity-[0.03] z-[-1] grayscale" data-alt="abstract architectural visualization of digital network connections in a dark obsidian space with subtle golden lines and cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBv5X8JNHG1nGot6YmJs06C_Mw82kF5eAkR7k6gMWBLun_uSJinLi5jEw2EAinijCvdPbxk4dwnKBO-N9RJfD05z-9oO6lC2LTDJOhseAPb1hn41mO9Fm9-aEN_Q7CYtCdbChzQJ2WHSmmpfvy4ZyEfHw4fySzToygyyPWEM1JIfG4XePsJmZx7nW58dSJCfrvW0l7RTCOgHA8lQWwCF87_cNcybX3jF16qW5i-fcey1HqN4hZe3smEMGWAdluvlGC_Xbfr67XLqpM"/>
+</body></html>

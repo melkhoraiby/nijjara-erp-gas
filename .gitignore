@@ -1,0 +1,15 @@
+# Service account keys
+nijjara-agent-*.json
+*.json
+!gas/appsscript.json
+!gas/.clasp.json
+
+# Logs
+*.log
+
+# Ignore node_modules if brought back
+node_modules/
+
+# OS generated files
+.DS_Store
+Thumbs.db

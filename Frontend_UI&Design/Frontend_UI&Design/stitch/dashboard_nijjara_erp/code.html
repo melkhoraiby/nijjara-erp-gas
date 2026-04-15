@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NIJJARA - نظام إدارة الموارد</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&amp;family=Inter:wght@100..900&amp;family=Manrope:wght@200..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-container": "#b6b8be",
+              "outline": "#9a8f80",
+              "on-tertiary-fixed": "#1a1c1c",
+              "surface-dim": "#131314",
+              "secondary-fixed-dim": "#c4c6cc",
+              "secondary-fixed": "#e0e2e8",
+              "primary-container": "#c5a059",
+              "outline-variant": "#4e4639",
+              "on-primary-container": "#4e3700",
+              "on-tertiary-container": "#393b3b",
+              "on-error-container": "#ffdad6",
+              "on-surface": "#e5e2e3",
+              "inverse-on-surface": "#313031",
+              "surface-variant": "#353436",
+              "on-background": "#e5e2e3",
+              "secondary": "#c4c6cc",
+              "surface-tint": "#e9c176",
+              "tertiary-fixed": "#e2e2e2",
+              "on-surface-variant": "#d1c5b4",
+              "surface-bright": "#3a393a",
+              "surface-container-low": "#1c1b1c",
+              "surface": "#131314",
+              "background": "#131314",
+              "on-primary-fixed": "#261900",
+              "surface-container": "#201f20",
+              "primary-fixed-dim": "#e9c176",
+              "on-error": "#690005",
+              "on-primary": "#412d00",
+              "on-secondary-fixed-variant": "#44474b",
+              "error": "#ffb4ab",
+              "surface-container-high": "#2a2a2b",
+              "inverse-primary": "#775a19",
+              "primary": "#e9c176",
+              "primary-fixed": "#ffdea5",
+              "on-secondary": "#2d3135",
+              "surface-container-highest": "#353436",
+              "surface-container-lowest": "#0e0e0f",
+              "secondary-container": "#46494e",
+              "error-container": "#93000a",
+              "on-tertiary-fixed-variant": "#454747",
+              "tertiary-container": "#a4a5a5",
+              "inverse-surface": "#e5e2e3",
+              "on-primary-fixed-variant": "#5d4201",
+              "on-secondary-fixed": "#181c20",
+              "tertiary": "#c6c6c7",
+              "on-tertiary": "#2f3131",
+              "tertiary-fixed-dim": "#c6c6c7"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"],
+              "cairo": ["Cairo"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        vertical-align: middle;
+      }
+      body {
+        background-color: #131314;
+        color: #e5e2e3;
+        font-family: 'Cairo', sans-serif;
+      }
+      .glass-card {
+        background: rgba(32, 31, 32, 0.4);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(229, 226, 227, 0.05);
+      }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 right-0 w-full z-50 flex items-center justify-between px-6 h-16 flex-row-reverse bg-[#131314]/80 backdrop-blur-xl border-b border-[#e5e2e3]/15 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+<div class="flex items-center gap-6 flex-row-reverse">
+<span class="text-2xl font-black text-[#e9c176] tracking-widest font-['Cairo']">NIJJARA</span>
+<div class="hidden md:flex gap-6 items-center flex-row-reverse">
+<a class="font-['Cairo'] font-bold text-lg tracking-tight text-[#e9c176] border-b-2 border-[#e9c176]" href="#">الرئيسية</a>
+<a class="font-['Cairo'] font-bold text-lg tracking-tight text-[#c4c6cc] hover:text-[#e5e2e3] transition-colors" href="#">الإحصائيات</a>
+<a class="font-['Cairo'] font-bold text-lg tracking-tight text-[#c4c6cc] hover:text-[#e5e2e3] transition-colors" href="#">السجلات</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary">search</span>
+<input class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg pr-10 pl-4 py-1.5 text-sm focus:border-primary/50 outline-none w-64" placeholder="بحث سريع..." type="text"/>
+</div>
+<button class="p-2 hover:bg-[#c4c6cc]/10 rounded-full transition-colors text-secondary">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-[#c4c6cc]/10 rounded-full transition-colors text-secondary">
+<span class="material-symbols-outlined" data-icon="apps">apps</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary/30">
+<img alt="User Profile Avatar" data-alt="close-up portrait of a professional executive in a sharp dark suit against a minimalist studio background with warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv3uuThslD-i2ecivUCGK00j9GEREpdAivBn3pNsrvQJpwCyJYRKat0jBUWMlSgXgGQ--ni9SoJZoe1weIoP-pJfnq2hKmrUNrpcmg6zTmWVE8KUyVo5RtyFyzS22j8M-nK9LsSJmGIBIjQk8IlN5HFagC7PE1wDxbrZwnsdO5MP3aMcRmDBMuts_kollwV2VAOXIEE_z8DWsr5nFK6Xe1xtDaLQv7dtveOk6xTRtLRh_ZFoKLNiprkNB23b9qRlR0RJOBCxwQdLc"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar (RTL) -->
+<aside class="fixed right-0 top-0 h-screen w-64 border-l border-[#e5e2e3]/15 bg-[#131314] z-40 surface-container-low backdrop-blur-lg shadow-2xl flex flex-col pt-20 pb-6 text-right">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-2 flex-row-reverse">
+<div class="w-10 h-10 bg-primary-container/20 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="account_balance">account_balance</span>
+</div>
+<div>
+<h2 class="text-[#e9c176] font-bold font-['Cairo']">المؤسسة</h2>
+<p class="text-[10px] text-secondary/60 uppercase tracking-tighter">نظام إدارة الموارد</p>
+</div>
+</div>
+<button class="w-full mt-4 bg-primary text-on-primary-container font-bold py-2.5 rounded-lg text-sm hover:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                إضافة عملية جديدة
+            </button>
+</div>
+<nav class="flex-1 overflow-y-auto px-3 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-gradient-to-l from-[#e9c176]/20 to-transparent text-[#e9c176] border-r-4 border-[#e9c176] font-['Cairo'] font-medium text-sm transition-transform hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>لوحة القيادة</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 font-['Cairo'] font-medium text-sm transition-transform hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span>الموارد البشرية</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 font-['Cairo'] font-medium text-sm transition-transform hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span>المالية</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 font-['Cairo'] font-medium text-sm transition-transform hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span>المشاريع</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 font-['Cairo'] font-medium text-sm transition-transform hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined" data-icon="handshake">handshake</span>
+<span>العملاء</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 font-['Cairo'] font-medium text-sm transition-transform hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span>التدقيق</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c4c6cc] hover:bg-[#e5e2e3]/5 font-['Cairo'] font-medium text-sm transition-transform hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>التقارير</span>
+</a>
+</nav>
+<div class="px-3 pt-6 border-t border-outline-variant/20 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-[#c4c6cc]/60 hover:text-[#e5e2e3] font-['Cairo'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>الإعدادات</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c4c6cc]/60 hover:text-[#e5e2e3] font-['Cairo'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>تسجيل الخروج</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="mr-64 pt-20 pb-16 px-8 min-h-screen">
+<!-- Hero Section / Financial Overview -->
+<header class="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Balance Card -->
+<div class="lg:col-span-2 glass-card rounded-xl p-8 relative overflow-hidden group">
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-primary/10 blur-[100px] rounded-full group-hover:bg-primary/20 transition-colors"></div>
+<div class="relative z-10 flex flex-col justify-between h-full">
+<div>
+<p class="text-secondary/70 text-sm font-medium mb-1">إجمالي رصيد الأعمال الحالي</p>
+<h1 class="text-6xl font-black font-headline text-on-surface tracking-tight">1,245,000 <span class="text-2xl text-primary font-cairo">ج.م</span></h1>
+</div>
+<div class="mt-8 flex gap-8 items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-500" data-icon="trending_up">trending_up</span>
+<span class="text-emerald-500 text-sm font-bold">+12.4%</span>
+<span class="text-secondary/40 text-xs">الشهر الماضي</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant/30"></div>
+<div class="flex gap-4">
+<button class="bg-surface-container-highest px-4 py-2 rounded-lg text-xs font-bold border border-outline-variant/30 hover:border-primary/50 transition-colors">عرض التفاصيل</button>
+<button class="bg-primary/10 text-primary px-4 py-2 rounded-lg text-xs font-bold border border-primary/20 hover:bg-primary/20 transition-colors">تحميل التقرير</button>
+</div>
+</div>
+</div>
+<!-- Visual Background Accent -->
+<div class="absolute bottom-0 left-0 w-1/3 h-full opacity-10 pointer-events-none">
+<svg class="w-full h-full" viewbox="0 0 200 200">
+<path d="M45.7,-78.3C58.9,-71.4,69.1,-58.5,76.4,-44.6C83.8,-30.7,88.3,-15.3,88.7,0.2C89,15.7,85.2,31.4,77.2,44.2C69.3,57,57.1,66.9,43.5,73.5C29.9,80.1,14.9,83.4,-0.4,84.1C-15.8,84.8,-31.6,82.9,-45.8,76.7C-60,70.5,-72.6,60,-80.4,46.8C-88.3,33.6,-91.4,16.8,-90.6,0.5C-89.8,-15.8,-85,-31.6,-76.3,-45C-67.6,-58.4,-55,-69.5,-41,-75.8C-27,-82.1,-13.5,-83.6,0.5,-84.5C14.5,-85.4,29,-85.7,45.7,-78.3Z" fill="#e9c176" transform="translate(100 100)"></path>
+</svg>
+</div>
+</div>
+<!-- Revenue Channels -->
+<div class="glass-card rounded-xl p-6">
+<h3 class="text-on-surface font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="bar_chart">bar_chart</span>
+                    أداء قنوات الإيرادات
+                </h3>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between text-xs mb-2">
+<span class="text-secondary/70">تأجير المصنع (داخلي)</span>
+<span class="text-primary">450,000 ج.م</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 65%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-2">
+<span class="text-secondary/70">معرض &amp;Pieces (داخلي)</span>
+<span class="text-primary">320,000 ج.م</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 45%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-2">
+<span class="text-secondary/70">المشاريع الخارجية</span>
+<span class="text-primary">475,000 ج.م</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-on-tertiary-container" style="width: 75%;"></div>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Bento Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+<!-- Active Projects (Center Span) -->
+<div class="lg:col-span-2 glass-card rounded-xl overflow-hidden flex flex-col">
+<div class="p-6 border-b border-outline-variant/10 flex justify-between items-center">
+<h3 class="text-on-surface font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="tactic">tactic</span>
+                        المشاريع النشطة
+                    </h3>
+<span class="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded font-bold">12 مشروع قيد التنفيذ</span>
+</div>
+<div class="p-0 overflow-x-auto">
+<table class="w-full text-right border-collapse">
+<thead>
+<tr class="bg-surface-container-high/50 text-[11px] text-secondary/60 uppercase tracking-widest">
+<th class="px-6 py-4 font-bold">المشروع</th>
+<th class="px-6 py-4 font-bold">الميزانية</th>
+<th class="px-6 py-4 font-bold">التسليم</th>
+<th class="px-6 py-4 font-bold">الحالة</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="font-bold text-on-surface group-hover:text-primary transition-colors">مجمع أركان السكني</div>
+<div class="text-[10px] text-secondary/50">الشيخ زايد، الجيزة</div>
+</td>
+<td class="px-6 py-4 font-headline text-secondary-fixed text-xs">280,000 ج.م</td>
+<td class="px-6 py-4 text-xs">14 يوم متبقي</td>
+<td class="px-6 py-4">
+<div class="w-24 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 82%;"></div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="font-bold text-on-surface group-hover:text-primary transition-colors">مقر البنك التجاري</div>
+<div class="text-[10px] text-secondary/50">العاصمة الإدارية</div>
+</td>
+<td class="px-6 py-4 font-headline text-secondary-fixed text-xs">1,200,000 ج.م</td>
+<td class="px-6 py-4 text-xs">45 يوم متبقي</td>
+<td class="px-6 py-4">
+<div class="w-24 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 35%;"></div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="font-bold text-on-surface group-hover:text-primary transition-colors">فيلا بالم هيلز D4</div>
+<div class="text-[10px] text-secondary/50">التجمع الخامس</div>
+</td>
+<td class="px-6 py-4 font-headline text-secondary-fixed text-xs">145,000 ج.م</td>
+<td class="px-6 py-4 text-xs">مكتمل</td>
+<td class="px-6 py-4">
+<span class="text-[10px] text-emerald-500 font-bold border border-emerald-500/30 px-2 py-0.5 rounded">تم التسليم</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Custody Status -->
+<div class="glass-card rounded-xl p-6">
+<h3 class="text-on-surface font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
+                    وضع العهد المالية
+                </h3>
+<div class="space-y-4">
+<div class="bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/10">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs text-secondary/60">عهد المحاسبين</span>
+<span class="text-xs font-bold text-on-surface">65,000 ج.م</span>
+</div>
+<div class="flex -space-x-2 space-x-reverse">
+<img alt="Avatar" class="w-6 h-6 rounded-full border-2 border-surface" data-alt="professional portrait of a financial accountant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuYgBxHDDDvgzmOaGMtImusgAQsvmSN2V3o0VzSp6PRpjukiAHhrDoi5XUDLofxWGT6hBuIhFkOpT5Z8NKIBlF97OGk51yOaND5OE7kwoAEX4NEb0Ug7cADOwFP-zrDNLdTNEplEFwZxWLkVotkgVK1ns3CRgR2SOoxdMiOX296azm5ps43rLwpMYvOJzVbxorCc5NxmErai0PH0OpQwJqoA7W-F7djxxbu0EQitoLa7tDJceih4G0RrEWKxcdnEyNKRyDxbhlNVk"/>
+<img alt="Avatar" class="w-6 h-6 rounded-full border-2 border-surface" data-alt="professional portrait of a female financial controller" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2VNtJhINdeGuvkqvbInfuLfsehaG0XIZMtVbrofLa3J5J2w8o5JRtV5HLLhwFkYMr4G-kHDymRqQYG86J8ZleGqZGdPMi7iZHIEOZueMf0b-srzEqlvoubxaoAonxP2y_hGyY9bmfgeMwZDH-ODxFYR0bPSzmw2hHFTdRjH60TjlZvrBev92hItmyWhScKTquq4ECKgGNiBctGP0ItSf5WY3IICnTBiI1ZaFpJJqtCApK0QbxCo2pIJePSRBW_Nf1RWHarJEeWI4"/>
+<div class="w-6 h-6 rounded-full bg-surface-container-highest border-2 border-surface flex items-center justify-center text-[8px]">+2</div>
+</div>
+</div>
+<div class="bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/10">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs text-secondary/60">عهد الملاك</span>
+<span class="text-xs font-bold text-primary">140,000 ج.م</span>
+</div>
+<div class="flex -space-x-2 space-x-reverse">
+<img alt="Avatar" class="w-6 h-6 rounded-full border-2 border-surface" data-alt="high-end corporate portrait of a business owner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5yzJrC6YB1EW1kPVMC3VeS_JAaCuq0f1gcX4ZZ2fEGQROcz-lGOaCy75uKk7PEYIYnfrhyfxoQDGgNw4H5ajV47kEMHnufZxTjLToVsre7_tNnT4NQdEZBE1B8h5OSZoNaDDK9msEKCmcXdNGMGIYrqeOqB4DyZNiwUyshvYvn3wE3VcClSjvuZ1tb-6g_TSTjGXgWR7fejYE8rbOnujFC4IMMlaAPm_9ThxIAIsZDA3kyvy6Rqo-IOPwxlRi9eK6kKcIJuBlydU"/>
+</div>
+</div>
+<div class="bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/10">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs text-secondary/60">عهد الموظفين</span>
+<span class="text-xs font-bold text-on-surface">22,500 ج.م</span>
+</div>
+<div class="flex -space-x-2 space-x-reverse">
+<img alt="Avatar" class="w-6 h-6 rounded-full border-2 border-surface" data-alt="casual but professional workplace portrait of a junior employee" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZhnWLuh6E-AMzXCtNayKcTaBFzp9DXkCwOqHTUy2sEVBj9ER6CdZZb2rQYmkLb9aRBpw7-EoqGa6-yIk0uKOAAESEnsoyU5Sfb39VoJQTGgJIp-y3aGr-tihcXA_qCK0B-YdWPIyevMo0o7f-d8vHp9ohVJyHoxpAm4FM1a84jxzEkT1rj0pzwWcsbVZNIdzUP9WV2wID8nZ6rZVK9zj_5mzyd1CHCNfryBEHjAsy3Pe7jzeOZWwkzYe2hSP18Mjnt9__jeZlsxE"/>
+<img alt="Avatar" class="w-6 h-6 rounded-full border-2 border-surface" data-alt="casual but professional workplace portrait of a middle manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3-4F1H9vrgE1BoFF-6KOyGjDZOtbcZGa8EfpMaunm3CWGqDoaaFO_JIgRydTYZZzLKGyWQ-ZSvZno3bpFf54ueiDxR3WRhotEByqP8wg0a-UCSTu9WIWhVFbASjf53TXai11XGEKvWsrfWcmDRzCHNkNxmX_aZcUHq-ffbPYvQyonw9ykFaxwSe5pN3BDBGV_sZrQr15B5ku178yy4t3mgEBueGP7jnQcCUF-49cBLKG9fBuUrVagjIadn0fbHaH6kKoOIzCRZ1s"/>
+<div class="w-6 h-6 rounded-full bg-surface-container-highest border-2 border-surface flex items-center justify-center text-[8px]">+14</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pending Approvals -->
+<div class="glass-card rounded-xl p-6">
+<h3 class="text-on-surface font-bold mb-6 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="rule">rule</span>
+                        طلبات معلقة
+                    </div>
+<span class="text-[10px] text-secondary/40 font-normal">عرض الكل</span>
+</h3>
+<div class="space-y-3">
+<div class="p-3 bg-surface-container-highest/20 rounded-lg hover:bg-surface-container-highest/40 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="text-xs font-bold text-on-surface">شراء مواد خام - رخام</h4>
+<p class="text-[10px] text-secondary/60">بواسطة: م. أحمد كمال</p>
+</div>
+<span class="text-[10px] font-headline text-primary">12,400 ج.م</span>
+</div>
+<div class="flex gap-2 mt-4">
+<button class="flex-1 py-1.5 bg-primary/20 text-primary text-[10px] font-bold rounded hover:bg-primary hover:text-on-primary-container transition-all">موافقة</button>
+<button class="flex-1 py-1.5 bg-surface-container-highest text-on-surface/50 text-[10px] font-bold rounded hover:text-error transition-all">رفض</button>
+</div>
+</div>
+<div class="p-3 bg-surface-container-highest/20 rounded-lg hover:bg-surface-container-highest/40 transition-colors opacity-80">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="text-xs font-bold text-on-surface">بدل انتقال - موقع زايد</h4>
+<p class="text-[10px] text-secondary/60">بواسطة: سارة محمود</p>
+</div>
+<span class="text-[10px] font-headline text-primary">450 ج.م</span>
+</div>
+<div class="flex gap-2 mt-4">
+<button class="flex-1 py-1.5 bg-primary/20 text-primary text-[10px] font-bold rounded">موافقة</button>
+<button class="flex-1 py-1.5 bg-surface-container-highest text-on-surface/50 text-[10px] font-bold rounded">رفض</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Audit Timeline (Bottom Span) -->
+<div class="lg:col-span-4 glass-card rounded-xl p-8">
+<h3 class="text-on-surface font-bold mb-8 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="history_edu">history_edu</span>
+                    سجل التدقيق الأخير
+                </h3>
+<div class="relative">
+<div class="absolute right-4 top-0 bottom-0 w-[1px] bg-outline-variant/20"></div>
+<div class="space-y-10 pr-12">
+<!-- Timeline Item 1 -->
+<div class="relative group">
+<div class="absolute -right-12 top-1.5 w-8 h-8 rounded-full bg-surface border border-primary/40 flex items-center justify-center z-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="receipt_long">receipt_long</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<span class="text-[10px] font-bold text-secondary-fixed bg-surface-container-highest px-2 py-0.5 rounded uppercase">فاتورة مبيعات</span>
+<span class="text-[10px] text-secondary/40">منذ ساعتين • 14:45</span>
+</div>
+<h4 class="text-sm font-bold text-on-surface">تم إصدار فاتورة نهائية لمشروع "فيلا بالم هيلز"</h4>
+<p class="text-xs text-secondary/60 mt-1">المبلغ المودع: 45,000 ج.م - تم التحقق بواسطة نظام التدقيق التلقائي</p>
+</div>
+<button class="text-primary text-[10px] font-bold flex items-center gap-1 hover:underline">
+                                    رؤية المصدر
+                                    <span class="material-symbols-outlined text-[12px]" data-icon="arrow_outward">arrow_outward</span>
+</button>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative group">
+<div class="absolute -right-12 top-1.5 w-8 h-8 rounded-full bg-surface border border-outline-variant/40 flex items-center justify-center z-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="person_edit">person_edit</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<span class="text-[10px] font-bold text-secondary-fixed bg-surface-container-highest px-2 py-0.5 rounded uppercase">تعديل بيانات</span>
+<span class="text-[10px] text-secondary/40">منذ 5 ساعات • 11:20</span>
+</div>
+<h4 class="text-sm font-bold text-on-surface">تعديل صلاحيات الوصول للمستخدم "أحمد علي"</h4>
+<p class="text-xs text-secondary/60 mt-1">تمت إضافة صلاحية "عرض التقارير المالية" - تمت بواسطة الأدمن</p>
+</div>
+<button class="text-primary text-[10px] font-bold flex items-center gap-1 hover:underline">
+                                    رؤية المصدر
+                                    <span class="material-symbols-outlined text-[12px]" data-icon="arrow_outward">arrow_outward</span>
+</button>
+</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative group">
+<div class="absolute -right-12 top-1.5 w-8 h-8 rounded-full bg-surface border border-error/40 flex items-center justify-center z-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-error text-sm" data-icon="warning">warning</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<span class="text-[10px] font-bold text-error bg-error/10 px-2 py-0.5 rounded uppercase">تنبيه نظام</span>
+<span class="text-[10px] text-secondary/40">أمس • 18:00</span>
+</div>
+<h4 class="text-sm font-bold text-on-surface">تجاوز ميزانية الشراء لمشروع "مقر البنك التجاري"</h4>
+<p class="text-xs text-secondary/60 mt-1">الزيادة الملحوظة: 12% فوق السقف المعتمد - يتطلب مراجعة فورية</p>
+</div>
+<button class="text-primary text-[10px] font-bold flex items-center gap-1 hover:underline">
+                                    رؤية المصدر
+                                    <span class="material-symbols-outlined text-[12px]" data-icon="arrow_outward">arrow_outward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 right-64 left-0 h-10 border-t border-[#e5e2e3]/5 bg-[#131314] z-50 flex justify-between items-center px-8 flex-row-reverse opacity-80 hover:opacity-100 transition-opacity">
+<p class="font-['Inter'] text-[11px] uppercase tracking-wider text-[#c4c6cc]">© 2024 نيجارة. جميع الحقوق محفوظة.</p>
+<div class="flex items-center gap-6">
+<span class="font-['Inter'] text-[11px] uppercase tracking-wider text-[#e9c176]">حالة النظام: مستقر</span>
+<span class="font-['Inter'] text-[11px] uppercase tracking-wider text-[#c4c6cc]/60 hover:text-[#e5e2e3] cursor-default">الجلسة الحالية: 02:45</span>
+</div>
+</footer>
+</body></html>

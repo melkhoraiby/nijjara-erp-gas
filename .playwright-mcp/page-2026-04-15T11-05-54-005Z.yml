@@ -1,0 +1,214 @@
+- application [ref=e1]:
+  - iframe [ref=e2]:
+    
+  - iframe [ref=e3]:
+    
+  - banner "شريط القوائم" [ref=e4]:
+    - generic [ref=e7]:
+      - link "الصفحة الرئيسية لجداول البيانات" [ref=e9] [cursor=pointer]:
+        - /url: https://docs.google.com/spreadsheets/?usp=sheets_web
+      - generic [ref=e16]:
+        - generic "NIJJARA" [ref=e18]:
+          - generic [ref=e20]: NIJJARA
+          - 'button "حالة المستند: تم حفظ التغييرات في Drive." [ref=e24]'
+        - generic [ref=e31]:
+          - button "Mohamed ElKhoraiby (خامل)" [ref=e37]:
+            - img "Mohamed ElKhoraiby" [ref=e42] [cursor=pointer]
+          - button "إظهار كل التعليقات" [ref=e44] [cursor=pointer]
+          - generic [ref=e47]:
+            - button "مشاركة. أي مستخدم لديه الرابط . تتوفر إمكانية الدخول لأي شخص لديه الرابط. لا يلزم تسجيل الدخول." [disabled] [ref=e48]: مشاركة
+            - button "إجراءات المشاركة السريعة" [disabled] [ref=e50]
+          - link "تسجيل الدخول" [ref=e54] [cursor=pointer]:
+            - /url: https://accounts.google.com/ServiceLogin?service=wise&passive=1209600&osid=1&continue=https://docs.google.com/spreadsheets/d/1Tvn1M80l6EPOIBymHFRguldergH3l3Oy5eTIe2lhUeo/edit&followup=https://docs.google.com/spreadsheets/d/1Tvn1M80l6EPOIBymHFRguldergH3l3Oy5eTIe2lhUeo/edit&ltmpl=sheets&ec=GAZAmwI
+    - generic [ref=e55]:
+      - menubar [ref=e57]:
+        - menuitem "ملف" [ref=e58] [cursor=pointer]
+        - menuitem "تعديل" [ref=e59] [cursor=pointer]
+        - menuitem "عرض" [ref=e60] [cursor=pointer]
+        - menuitem "إدراج" [ref=e61] [cursor=pointer]
+        - menuitem "التنسيق" [ref=e62] [cursor=pointer]
+        - menuitem "البيانات" [ref=e63] [cursor=pointer]
+        - menuitem "أدوات" [ref=e64] [cursor=pointer]
+        - menuitem "الإضافات" [ref=e65] [cursor=pointer]
+        - menuitem "مساعدة" [ref=e66] [cursor=pointer]
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - toolbar "إمكانية البحث في القوائم (Alt+/)" [ref=e69]:
+            - combobox "القوائم" [ref=e71]
+          - toolbar "رئيسي" [ref=e72]:
+            - button "تراجع (Ctrl+Z)" [ref=e73] [cursor=pointer]
+            - button "إعادة (Ctrl+Y)" [ref=e78] [cursor=pointer]
+            - button "طباعة (Ctrl+P)" [ref=e83] [cursor=pointer]
+            - button "نسخ التنسيق" [ref=e88] [cursor=pointer]
+            - combobox "تكبير/تصغير" [ref=e93] [cursor=pointer]:
+              - option "قائمة تكبير/تصغير. تم اختيار 100%." [selected] [ref=e96]:
+                - textbox "تكبير/تصغير" [ref=e97]: 100%
+            - separator [disabled] [ref=e101]
+            - button "تنسيق كعملة" [ref=e102] [cursor=pointer]:
+              - generic [ref=e104]: $
+            - button "تنسيق كنسبة مئوية" [ref=e105] [cursor=pointer]:
+              - generic [ref=e107]: "%"
+            - button "تقليل المنازل العشرية" [ref=e108] [cursor=pointer]
+            - button "زيادة المنازل العشرية" [ref=e113] [cursor=pointer]
+            - button "مزيد من التنسيقات" [ref=e118] [cursor=pointer]:
+              - generic [ref=e121]: "123"
+            - separator [disabled] [ref=e122]
+            - listbox "الخط" [ref=e123] [cursor=pointer]:
+              - option "قائمة الخط. تم اختيار تلقائي (Arial)." [selected] [ref=e126]: تلقائي (Arial)
+            - separator [disabled] [ref=e130]
+            - button "تقليل حجم الخط (Ctrl+Shift+فاصلة)" [ref=e131] [cursor=pointer]
+            - combobox "حجم الخط" [ref=e136] [cursor=pointer]:
+              - option "قائمة حجم الخط. تم اختيار 10." [selected] [ref=e139]:
+                - textbox "حجم الخط" [ref=e140]: "10"
+            - button "زيادة حجم الخط (Ctrl+Shift+نقطة)" [ref=e141] [cursor=pointer]
+            - separator [disabled] [ref=e146]
+            - button "غامق (Ctrl+B)" [ref=e147] [cursor=pointer]
+            - button "مائل (Ctrl+I)" [ref=e152] [cursor=pointer]
+            - button "نص يتوسّطه خط (Alt+Shift+5)" [ref=e157] [cursor=pointer]
+            - button "لون النص" [ref=e162] [cursor=pointer]
+            - separator [disabled] [ref=e169]
+            - button "المزيد" [ref=e170] [cursor=pointer]
+        - toolbar "الوضع والعرض" [ref=e177]:
+          - button "إخفاء القوائم (Ctrl+Shift+F)" [ref=e178] [cursor=pointer]
+    - generic [ref=e185]:
+      - generic "مربّع الاسم (Ctrl + J)" [ref=e186]:
+        - textbox [ref=e187]: A1
+        - 'button "زر قائمة مربّع الاسم: اختَر أحد عناصر القائمة للانتقال إلى النطاق المُعنوَن المقابله له." [ref=e189] [cursor=pointer]'
+      - textbox [ref=e205]
+  - generic [ref=e208]:
+    - generic [ref=e240]:
+      - button "إضافة" [ref=e241] [cursor=pointer]
+      - textbox "عدد الصفوف المراد إضافتها" [ref=e242]: "1000"
+      - generic [ref=e243]: المزيد من الصفوف في الأسفل
+    - navigation "شريط علامات تبويب الأوراق" [ref=e257]:
+      - toolbar [ref=e258]:
+        - button "إضافة ورقة" [ref=e259] [cursor=pointer]
+        - button "كل الأوراق" [ref=e264] [cursor=pointer]
+      - toolbar [ref=e273]:
+        - button "FIN_Expenses" [ref=e274]:
+          - generic [ref=e278]: FIN_Expenses
+        - button "SYS_UserAccessRules" [ref=e282] [cursor=pointer]:
+          - generic [ref=e286]: SYS_UserAccessRules
+        - button "SYS_UserPermissions" [ref=e290] [cursor=pointer]:
+          - generic [ref=e294]: SYS_UserPermissions
+        - button "SETUP_Check" [ref=e298] [cursor=pointer]:
+          - generic [ref=e302]: SETUP_Check
+        - button "SYS_Users" [ref=e306] [cursor=pointer]:
+          - generic [ref=e310]: SYS_Users
+        - button "SYS_PasswordResets" [ref=e314] [cursor=pointer]:
+          - generic [ref=e318]: SYS_PasswordResets
+        - button "SYS_Roles" [ref=e322] [cursor=pointer]:
+          - generic [ref=e326]: SYS_Roles
+        - button "SYS_Permissions" [ref=e330] [cursor=pointer]:
+          - generic [ref=e334]: SYS_Permissions
+        - button "SYS_UserRoles" [ref=e338] [cursor=pointer]:
+          - generic [ref=e342]: SYS_UserRoles
+        - button "SYS_RolePermissions" [ref=e346] [cursor=pointer]:
+          - generic [ref=e350]: SYS_RolePermissions
+        - button "SYS_WorkflowMatrix" [ref=e354] [cursor=pointer]:
+          - generic [ref=e358]: SYS_WorkflowMatrix
+        - button "SYS_Notifications" [ref=e362] [cursor=pointer]:
+          - generic [ref=e366]: SYS_Notifications
+        - button "SYS_NotificationActions" [ref=e370] [cursor=pointer]:
+          - generic [ref=e374]: SYS_NotificationActions
+        - button "SYS_Attachments" [ref=e378] [cursor=pointer]:
+          - generic [ref=e382]: SYS_Attachments
+        - button "SYS_AuditLog" [ref=e386] [cursor=pointer]:
+          - generic [ref=e390]: SYS_AuditLog
+        - button "FIN_CustodyTransfers" [ref=e394] [cursor=pointer]:
+          - generic [ref=e398]: FIN_CustodyTransfers
+        - button "FIN_CustodyTransactions" [ref=e402] [cursor=pointer]:
+          - generic [ref=e406]: FIN_CustodyTransactions
+        - button "FIN_CustodyAdjustments" [ref=e410] [cursor=pointer]:
+          - generic [ref=e414]: FIN_CustodyAdjustments
+        - button "FIN_CompanyLedger" [ref=e418] [cursor=pointer]:
+          - generic [ref=e422]: FIN_CompanyLedger
+        - button "HRM_VacationRequests" [ref=e426] [cursor=pointer]:
+          - generic [ref=e430]: HRM_VacationRequests
+        - button "HRM_ExcuseRequests" [ref=e434] [cursor=pointer]:
+          - generic [ref=e438]: HRM_ExcuseRequests
+        - button "HRM_Attendance" [ref=e442] [cursor=pointer]:
+          - generic [ref=e446]: HRM_Attendance
+        - button "HRM_AttendanceRules" [ref=e450] [cursor=pointer]:
+          - generic [ref=e454]: HRM_AttendanceRules
+        - button "HRM_PenaltyPolicies" [ref=e458] [cursor=pointer]:
+          - generic [ref=e462]: HRM_PenaltyPolicies
+        - button "HRM_OTRequests" [ref=e466] [cursor=pointer]:
+          - generic [ref=e470]: HRM_OTRequests
+        - button "HRM_OTRules" [ref=e474] [cursor=pointer]:
+          - generic [ref=e478]: HRM_OTRules
+        - button "HRM_Bonuses" [ref=e482] [cursor=pointer]:
+          - generic [ref=e486]: HRM_Bonuses
+        - button "HRM_SalaryChanges" [ref=e490] [cursor=pointer]:
+          - generic [ref=e494]: HRM_SalaryChanges
+        - button "HRM_PayrollRuns" [ref=e498] [cursor=pointer]:
+          - generic [ref=e502]: HRM_PayrollRuns
+        - button "HRM_PayrollItems" [ref=e506] [cursor=pointer]:
+          - generic [ref=e510]: HRM_PayrollItems
+        - button "PAR_Advances" [ref=e514] [cursor=pointer]:
+          - generic [ref=e518]: PAR_Advances
+        - button "PAR_FundingMovements" [ref=e522] [cursor=pointer]:
+          - generic [ref=e526]: PAR_FundingMovements
+        - button "PAR_Settlements" [ref=e530] [cursor=pointer]:
+          - generic [ref=e534]: PAR_Settlements
+        - button "PAR_ShareLedger" [ref=e538] [cursor=pointer]:
+          - generic [ref=e542]: PAR_ShareLedger
+        - button "PAR_ProfitLoss" [ref=e546] [cursor=pointer]:
+          - generic [ref=e550]: PAR_ProfitLoss
+        - button "PRJ_BudgetRevisions" [ref=e554] [cursor=pointer]:
+          - generic [ref=e558]: PRJ_BudgetRevisions
+        - button "PRJ_StatusHistory" [ref=e562] [cursor=pointer]:
+          - generic [ref=e566]: PRJ_StatusHistory
+        - button "FIN_AllocationChannels" [ref=e570] [cursor=pointer]:
+          - generic [ref=e574]: FIN_AllocationChannels
+        - button "FIN_CustodyAccounts" [ref=e578] [cursor=pointer]:
+          - generic [ref=e582]: FIN_CustodyAccounts
+        - button "FIN_RevenueChannels" [ref=e586] [cursor=pointer]:
+          - generic [ref=e590]: FIN_RevenueChannels
+        - button "FIN_Revenue" [ref=e594] [cursor=pointer]:
+          - generic [ref=e598]: FIN_Revenue
+        - button "PRJ_Projects" [ref=e602] [cursor=pointer]:
+          - generic [ref=e606]: PRJ_Projects
+        - button "PRJ_Payments" [ref=e610] [cursor=pointer]:
+          - generic [ref=e614]: PRJ_Payments
+        - button "Sheet15" [ref=e618] [cursor=pointer]:
+          - generic [ref=e622]: Sheet15
+        - button "Sheet16" [ref=e626] [cursor=pointer]:
+          - generic [ref=e630]: Sheet16
+        - button "Sheet17" [ref=e634] [cursor=pointer]:
+          - generic [ref=e638]: Sheet17
+        - button "PRJ_Clients" [ref=e642] [cursor=pointer]:
+          - generic [ref=e646]: PRJ_Clients
+        - button "HRM_Employees" [ref=e650] [cursor=pointer]:
+          - generic [ref=e654]: HRM_Employees
+        - button "HRM_Advances" [ref=e658] [cursor=pointer]:
+          - generic [ref=e662]: HRM_Advances
+        - button "SET_Enums" [ref=e666] [cursor=pointer]:
+          - generic [ref=e670]: SET_Enums
+        - button "SET_ExpenseCatalog" [ref=e674] [cursor=pointer]:
+          - generic [ref=e678]: SET_ExpenseCatalog
+        - button "SET_MaterialCatalog" [ref=e682] [cursor=pointer]:
+          - generic [ref=e686]: SET_MaterialCatalog
+        - button "PAR_Partners" [ref=e690] [cursor=pointer]:
+          - generic [ref=e694]: PAR_Partners
+        - button "FIN_InternalRevenue" [ref=e698] [cursor=pointer]:
+          - generic [ref=e702]: FIN_InternalRevenue
+        - button "FIN_InternalRevenueRefs" [ref=e706] [cursor=pointer]:
+          - generic [ref=e710]: FIN_InternalRevenueRefs
+        - button "FIN_InternalRevenuePayments" [ref=e714] [cursor=pointer]:
+          - generic [ref=e718]: FIN_InternalRevenuePayments
+      - toolbar [ref=e722]:
+        - button "تمرير لليمين" [ref=e723] [cursor=pointer]
+        - button "التمرير لليسار" [disabled] [ref=e728]
+      - contentinfo [ref=e733]:
+        - generic [ref=e737]: يتم عرض 12 من إجمالي 2,745 صف.
+  - generic [ref=e738]:
+    - textbox [active]
+  - link "تفعيل إمكانية استخدام قارئ الشاشة" [ref=e739] [cursor=pointer]:
+    - /url: "#"
+  - textbox [ref=e740]
+  - region [ref=e741]: لتفعيل التوافق مع قارئ الشاشة، يمكنك الضغط على Ctrl+Alt+Z للتعرف على معلومات حول اختصارات لوحة المفاتيح، يمكنك الضغط على Ctrl+شرطة مائلة
+  - region
+  - generic [ref=e742]: انضم Mohamed ElKhoraiby إلى المستند.
+  - iframe [ref=e744]:
+    

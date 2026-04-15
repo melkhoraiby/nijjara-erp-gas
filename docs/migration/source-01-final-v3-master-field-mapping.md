@@ -1,0 +1,258 @@
+# Source 01 Final V3 Master Field Mapping Preparation
+
+This document records the first field-level mapping preparation pass for the base masters and channel structure from the sole raw source workbook `data/raw/Nijjara-Data_Final-V3.xlsx`.
+
+## `Employees`
+
+- Source sheet name: `Employees`
+- Likely target entity: Employees
+- Likely target table: `hrm_employees` for the currently implemented foundation, with additional future HR profile structures likely needed later
+- Source primary key candidate: `Employee_ID`
+- Source columns to map now:
+  - `Employee_ID`
+  - `Full_Name_AR`
+  - `Full_Name_EN`
+  - `Email`
+  - `Mobile`
+  - `Is_Active`
+- Source columns to defer:
+  - `Date_Of_Birth`
+  - `Gender`
+  - `National_ID_Number`
+  - `Marital_Status`
+  - `Military_Status`
+  - `Alt_Mobile`
+  - `Address_AR`
+  - `Emergency_Contact_Name`
+  - `Emergency_Contact_Relation`
+  - `Emergency_Contact_Mobile`
+  - `Job_Title_AR`
+  - `Department_Name_AR`
+  - `Hire_Date`
+  - `Contract_Type`
+  - `Basic_Salary`
+  - `Allowances`
+  - `Deductions`
+  - `Status`
+- Target columns already existing:
+  - `employee_code`
+  - `arabic_full_name`
+  - `english_full_name`
+  - `email`
+  - `mobile_number`
+  - `is_active`
+- Target columns not yet modeled:
+  - all personal-profile fields
+  - emergency-contact fields
+  - job and department fields
+  - hire and contract fields
+  - salary and compensation fields
+  - explicit business status beyond the active flag
+- Normalization rules:
+  - map `Employee_ID` to `employee_code`
+  - map `Full_Name_AR` to `arabic_full_name`
+  - map `Full_Name_EN` to `english_full_name`
+  - preserve leading zero in `Mobile`
+  - map `Is_Active` to boolean `is_active`
+  - treat blank optional values as null
+  - keep `Status` separate from `Is_Active` for later modeling, not forced into the current foundation table
+- Dependency notes:
+  - employees are a base identity lane and should load before users and employee-linked transactions
+  - later attendance, payroll, and employee advances depend on stable employee identity mapping
+- Open questions:
+  - should `Employee_ID` remain the long-term business key or is there a separate employee code expected later?
+  - should compensation fields remain part of employee master import planning or be deferred to payroll-linked structures?
+  - should `Status` eventually become its own controlled lifecycle field in addition to `Is_Active`?
+
+## `Partners`
+
+- Source sheet name: `Partners`
+- Likely target entity: Partners / BODs
+- Likely target table: not implemented yet; likely a future partner or shared party master table
+- Source primary key candidate: `Partner_ID`
+- Source columns to map now:
+  - `Partner_ID`
+  - `Partner_Name_AR`
+  - `Partner_Name_EN`
+  - `Mobile`
+  - `Email`
+  - `Status_Code`
+  - `Is_Active`
+- Source columns to defer:
+  - `Search_Text_AR`
+- Target columns already existing:
+  - none in current schema or app implementation
+- Target columns not yet modeled:
+  - all partner identity, contact, and status fields
+- Normalization rules:
+  - preserve `Partner_ID` as the primary source business key candidate
+  - preserve leading zeros if mobile values appear later
+  - map Arabic and English names as separate fields rather than merging them into one display field
+  - keep `Search_Text_AR` as reference-only unless a future search-helper strategy requires persistence
+  - do not collapse `Status_Code` into `Is_Active`
+- Dependency notes:
+  - partners are a base identity lane for later custody, partner funding, and partner advance records
+- Open questions:
+  - should partners and BODs share one table with a type discriminator, or one unified party table?
+  - is `Status_Code` already aligned with `System Enums`, or is it workbook-local?
+
+## `Clients`
+
+- Source sheet name: `Clients`
+- Likely target entity: Clients
+- Likely target table: not implemented yet; likely a future project-domain client master table
+- Source primary key candidate: `Client_ID`
+- Source columns to map now:
+  - `Client_ID`
+  - `Client_Name_EN`
+  - `Client_Name_AR`
+  - `Email`
+  - `Mobile`
+  - `Status`
+- Source columns to defer:
+  - `Client_Name`
+  - `Search_Text`
+- Target columns already existing:
+  - none in current schema or app implementation
+- Target columns not yet modeled:
+  - all client identity and contact fields
+- Normalization rules:
+  - treat `Client_ID` as the primary source business key candidate
+  - split bilingual names into separate target fields
+  - treat `Client_Name` as a source-side combined display field, not the primary canonical storage field
+  - preserve leading zero in `Mobile` if populated
+  - keep `Search_Text` as reference or regenerated helper data, not an assumed final business field
+- Dependency notes:
+  - clients must be stable before project import and project-payment import
+- Open questions:
+  - is `Status` a controlled enum field or free-text business state?
+  - should combined display values in `Client_Name` be regenerated instead of stored?
+
+## `Projects`
+
+- Source sheet name: `Projects`
+- Likely target entity: Projects
+- Likely target table: not implemented yet; likely a future project master table
+- Source primary key candidate: `Project_ID`
+- Source columns to map now:
+  - `Project_ID`
+  - `Project_Name_EN`
+  - `Project_Name_AR`
+  - `Client_ID`
+  - `Project_Budget`
+  - `Amount_Received`
+  - `Amount_Remaining`
+  - `Contract_Start_Date`
+  - `Contract_Delivery_Days`
+  - `Estimate_End_Date`
+  - `Actual_Start_Date`
+  - `Actual_End_Date`
+  - `Project_Status`
+  - `Is_Active`
+- Source columns to defer:
+  - `Project_Name`
+  - `Client_Name`
+  - `Search_Text`
+- Target columns already existing:
+  - none in current schema or app implementation
+- Target columns not yet modeled:
+  - all project master fields
+  - client foreign key linkage
+  - budget and progress amounts
+  - contractual and actual timeline fields
+  - project status field
+- Normalization rules:
+  - treat `Project_ID` as the source primary business key candidate
+  - map bilingual names into separate target fields
+  - treat `Project_Name` as a combined display field, not the primary canonical storage field
+  - validate `Client_ID` against the client mapping lane
+  - keep `Client_Name` and `Search_Text` as reference-only or regenerated helper values
+  - preserve numeric amounts as business amounts and avoid mixing summary fields with payment history rows
+- Dependency notes:
+  - depends on stable client mapping
+  - later project payments, expense allocation, and income rows depend on stable project IDs
+- Open questions:
+  - should project budget summary values live in one project table or later split into setup and tracking structures?
+  - how should `Project_Status` be aligned with final workflow or status enums?
+  - should `Contract_Delivery_Days` remain nullable numeric days or later drive derived date logic only?
+
+## `Custody Accounts`
+
+- Source sheet name: `Custody Accounts`
+- Likely target entity: Custody Accounts
+- Likely target table: not implemented yet; likely a future finance custody master table
+- Source primary key candidate: `Custody_Account_ID`
+- Source columns to map now:
+  - `Custody_Account_ID`
+  - `Account_Name_AR`
+  - `Partner_Type_Code`
+  - `Partner_ID`
+  - `Partner_Name_AR`
+  - `Allow_Expense_Use`
+  - `Linked_Employee_ID`
+  - `Linked_Partner_ID`
+  - `Holder_ID`
+  - `Currency_Code`
+  - `Status_Code`
+  - `Is_Active`
+  - `Is_Primary`
+  - `Is_Main_Treasury`
+- Source columns to defer:
+  - `Search_Text_AR`
+- Target columns already existing:
+  - none in current schema or app implementation
+- Target columns not yet modeled:
+  - all custody account fields
+  - holder and linked-entity references
+  - treasury flags and expense-use permissions
+- Normalization rules:
+  - preserve `Custody_Account_ID` as the source business key candidate
+  - validate `Linked_Employee_ID` against the employee lane
+  - validate `Linked_Partner_ID` and `Partner_ID` against the partner lane
+  - keep `Search_Text_AR` as reference-only unless a later search-helper strategy requires it
+  - do not collapse `Status_Code`, `Is_Active`, `Is_Primary`, and `Is_Main_Treasury` into one status concept
+  - preserve `Currency_Code` as a controlled currency code candidate
+- Dependency notes:
+  - depends on employees and partners for holder resolution
+  - later expenses, payroll, and transfers depend on stable custody-account mapping
+- Open questions:
+  - what is the intended distinction between `Partner_ID`, `Linked_Partner_ID`, and `Holder_ID`?
+  - should custody holders point to a shared holder entity later, or stay polymorphic by employee/partner linkage?
+  - should `Allow_Expense_Use` be a business rule field in the final model or an operational flag only?
+
+## `Revenue Channels`
+
+- Source sheet name: `Revenue Channels`
+- Likely target entity: Revenue Channels
+- Likely target table: not implemented yet; likely a future revenue-channel structure table
+- Source primary key candidate: `Rev_Channel_ID`
+- Source columns to map now:
+  - `Rev_Channel_ID`
+  - `Rev_Channel_Type`
+  - `Channel_Name_AR`
+  - `Channel_Name_EN`
+  - `Rev_Channel_Entity/Client`
+  - `Description_AR`
+  - `Description_EN`
+  - `Status_Code`
+  - `Is_Active`
+- Source columns to defer:
+  - `Search_Text_AR`
+- Target columns already existing:
+  - none in current schema or app implementation
+- Target columns not yet modeled:
+  - all revenue-channel structure fields
+  - possible entity linkage field
+- Normalization rules:
+  - preserve `Rev_Channel_ID` as the source business key candidate
+  - align `Rev_Channel_Type` against the approved internal/external revenue channel model
+  - treat bilingual names as canonical separate fields
+  - determine whether `Rev_Channel_Entity/Client` is a code, a label, or a polymorphic reference before final mapping decisions
+  - keep `Search_Text_AR` as reference-only unless persistence is later justified
+  - do not collapse `Status_Code` into `Is_Active`
+- Dependency notes:
+  - external channels may depend on stable project interpretation
+  - later income and expense transaction mapping depends on stable revenue-channel interpretation
+- Open questions:
+  - does `Rev_Channel_Entity/Client` point to a project/client source lane, or does it hold a non-relational business descriptor such as `FACTORY`?
+  - should internal revenue channels be fully stored in this table or partly derived from business rules?

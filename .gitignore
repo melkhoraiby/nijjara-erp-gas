@@ -3,6 +3,8 @@ nijjara-agent-*.json
 *.json
 !gas/appsscript.json
 !gas/.clasp.json
+!gas/.htmlvalidate.json
+!.htmlvalidate.json
 
 # Logs
 *.log

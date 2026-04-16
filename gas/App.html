@@ -518,7 +518,7 @@
     async function prefetchMarkedModules() {
       if (!state.session || !state.bootstrap || state._markedPrefetchStarted) return;
       state._markedPrefetchStarted = true;
-      var moduleKeys = ['users', 'roles', 'actionPermissions', 'employees', 'expenses', 'projectRevenueTracking', 'internalChannels', 'internalRevenuePayments', 'showroomOrders', 'recordPayment', 'employeesAdvances', 'partnersData', 'projects', 'clients', 'projectBudgets', 'projectDirectExpenses', 'projectStatusMonitoring', 'notifications', 'auditLogs'];
+      var moduleKeys = ['users', 'roles', 'actionPermissions', 'employees', 'expenses', 'projectRevenueTracking', 'internalChannels', 'internalRevenuePayments', 'showroomOrders', 'employeesAdvances', 'partnersData', 'projects', 'clients', 'projectBudgets', 'projectDirectExpenses', 'projectStatusMonitoring', 'notifications', 'auditLogs'];
       for (var index = 0; index < moduleKeys.length; index += 1) {
         try {
           await ensureModuleDataLoaded(moduleKeys[index], false, { silent: true, skipRender: true });
@@ -3143,9 +3143,6 @@
       var dataset = getDatasetForModule(windowItem.key);
       var moduleActions = state.bootstrap.moduleActions[windowItem.key] || {};
       if (!dataset) {
-        if (windowItem.viewType === 'unified-revenue') {
-          ensureModuleDataLoaded(windowItem.key, false, { silent: false }).catch(function () {});
-        }
         return '' +
           '<article class="workspace-window" id="window-' + e(windowItem.id) + '" data-window-key="' + e(windowItem.key) + '" style="top:' + windowItem.y + 'px;right:' + windowItem.x + 'px;width:' + windowItem.width + 'px;height:' + windowItem.height + 'px;z-index:' + windowItem.zIndex + '">' +
             renderWindowChrome(windowItem) +

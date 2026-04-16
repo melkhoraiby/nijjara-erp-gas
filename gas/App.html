@@ -518,7 +518,7 @@
     async function prefetchMarkedModules() {
       if (!state.session || !state.bootstrap || state._markedPrefetchStarted) return;
       state._markedPrefetchStarted = true;
-      var moduleKeys = ['users', 'roles', 'actionPermissions', 'employees', 'expenses', 'projectRevenueTracking', 'internalChannels', 'internalRevenuePayments', 'employeesAdvances', 'partnersData', 'projects', 'clients', 'projectBudgets', 'projectDirectExpenses', 'projectStatusMonitoring', 'notifications', 'auditLogs'];
+      var moduleKeys = ['users', 'roles', 'actionPermissions', 'employees', 'expenses', 'projectRevenueTracking', 'internalChannels', 'internalRevenuePayments', 'showroomOrders', 'recordPayment', 'employeesAdvances', 'partnersData', 'projects', 'clients', 'projectBudgets', 'projectDirectExpenses', 'projectStatusMonitoring', 'notifications', 'auditLogs'];
       for (var index = 0; index < moduleKeys.length; index += 1) {
         try {
           await ensureModuleDataLoaded(moduleKeys[index], false, { silent: true, skipRender: true });
@@ -611,7 +611,10 @@
         return collection.concat(sources);
       }, []);
       var needsLookups = requiredSources.length > 0;
-      state.modalForm = { moduleKey: key, mode: 'new', schema: schema, existingAttachments: [], pendingAttachments: [], summary: null, values: key === 'users' ? { primaryRoleCode: 'employee', accessRules: [] } : {} };
+      var defaultFormValues = key === 'users' ? { primaryRoleCode: 'employee', accessRules: [] }
+        : key === 'recordPayment' ? { paymentDate: new Date().toISOString().slice(0, 10) }
+        : {};
+      state.modalForm = { moduleKey: key, mode: 'new', schema: schema, existingAttachments: [], pendingAttachments: [], summary: null, values: defaultFormValues };
       render();
       if (needsLookups) {
         ensureLookupsLoaded(requiredSources).then(function () {
@@ -946,7 +949,7 @@
         ensureCustodyDataLoaded().catch(function (error) {
           toast('error', error.message);
         });
-      } else if (item.viewType === 'grid') {
+      } else if (item.viewType === 'grid' || item.viewType === 'unified-revenue') {
         ensureModuleDataLoaded(item.key).catch(function (error) {
           toast('error', error.message);
         });
@@ -1397,6 +1400,30 @@
           ];
         }
       var summaryKeys = (schema.summaryFieldKeys && schema.summaryFieldKeys.length ? schema.summaryFieldKeys : Object.keys(payload).filter(function (key) { return key !== 'attachmentCount'; }));
+      if (moduleKey === 'recordPayment') {
+        var rpSumCat = String(payload.paymentCategory || '').toUpperCase();
+        var rpSumSub = String(payload.internalSubType || '').toUpperCase();
+        var rpCatLabel = rpSumCat === 'PROJECT' ? 'دفعة مشروع' : rpSumCat === 'INTERNAL' ? 'قناة داخلية' : '—';
+        var rpSourceLabel = '—';
+        if (rpSumCat === 'PROJECT') {
+          var rpSumProject = getLookupByValue('activeProjects', payload.projectId);
+          rpSourceLabel = rpSumProject ? rpSumProject.label : (payload.projectId || '—');
+        } else if (rpSumCat === 'INTERNAL' && rpSumSub === 'SHOWROOM') {
+          var rpSumShowroom = getLookupByValue('activeShowroomOrders', payload.showroomOrderId);
+          rpSourceLabel = (rpSumShowroom ? rpSumShowroom.label : (payload.showroomOrderId || '—')) + ' (معرض)';
+        } else if (rpSumCat === 'INTERNAL' && rpSumSub === 'FACTORY_MACHINERY') {
+          rpSourceLabel = (payload.factoryOrderName || '—') + ' (ماكينات)';
+        }
+        var rpSumCustody = getLookupByValue('custodyAccounts', payload.receivedCustodyAccountId);
+        return [
+          rpCatLabel,
+          formatDateValue(payload.paymentDate) || '—',
+          payload.amount ? money(Number(payload.amount || 0)) : '—',
+          rpSourceLabel,
+          rpSumCustody ? rpSumCustody.label : (payload.receivedCustodyAccountId || '—'),
+          payload.notes || '—'
+        ];
+      }
       if (moduleKey === 'users') {
         return summaryKeys.map(function (key) {
           if (key === 'attachments') return attachments.length ? attachments.join('، ') : '—';
@@ -1568,6 +1595,45 @@
         if (custody) {
           addCard('رصيد العهدة الحالي', money(custody.balance || 0), custody.label || '');
           if (values.paymentAmount) addCard('الرصيد بعد التسجيل', money((Number(custody.balance || 0) || 0) + (Number(values.paymentAmount || 0) || 0)), 'بعد إضافة الإيراد');
+        }
+      }
+
+      if (state.modalForm.moduleKey === 'recordPayment') {
+        var rpContextCat = String(values.paymentCategory || '').toUpperCase();
+        var rpContextSub = String(values.internalSubType || '').toUpperCase();
+        var rpAmount = Number(values.amount || 0);
+        if (rpContextCat === 'PROJECT') {
+          var rpProject = getLookupByValue('activeProjects', values.projectId);
+          custody = getLookupByValue('custodyAccounts', values.receivedCustodyAccountId);
+          if (rpProject) {
+            addCard('إجمالي المستلم حتى الآن', money(rpProject.received || 0), rpProject.label || '');
+            addCard('المتبقي من المشروع', money(rpProject.remaining || 0), 'من الميزانية الإجمالية');
+            addCard('الميزانية الإجمالية', money(rpProject.budget || 0), rpProject.sublabel || '');
+          }
+          if (custody) {
+            addCard('رصيد العهدة الحالي', money(custody.balance || 0), custody.label || '');
+            if (rpAmount) addCard('الرصيد بعد التحصيل', money((Number(custody.balance || 0)) + rpAmount), 'بعد إضافة الدفعة');
+          }
+        } else if (rpContextCat === 'INTERNAL' && rpContextSub === 'SHOWROOM') {
+          var rpShowroom = getLookupByValue('activeShowroomOrders', values.showroomOrderId);
+          custody = getLookupByValue('custodyAccounts', values.receivedCustodyAccountId);
+          if (rpShowroom) {
+            addCard('السعر المتفق عليه', money(rpShowroom.agreedPrice || 0), rpShowroom.label || '');
+            addCard('إجمالي المستلم', money(rpShowroom.totalReceived || 0), 'من هذا الطلب');
+            addCard('المتبقي', money(rpShowroom.totalRemaining || 0), 'من الطلب');
+          }
+          if (custody) {
+            addCard('رصيد العهدة الحالي', money(custody.balance || 0), custody.label || '');
+            if (rpAmount) addCard('الرصيد بعد التسجيل', money((Number(custody.balance || 0)) + rpAmount), 'بعد إضافة الإيراد');
+          }
+        } else if (rpContextCat === 'INTERNAL' && rpContextSub === 'FACTORY_MACHINERY') {
+          custody = getLookupByValue('custodyAccounts', values.receivedCustodyAccountId);
+          if (values.totalOrderCost) addCard('التكلفة المتفق عليها', money(Number(values.totalOrderCost || 0)), 'تكلفة أمر التشغيل');
+          if (rpAmount) addCard('الدفعة المسجلة الآن', money(rpAmount), 'المبلغ المستلم');
+          if (custody) {
+            addCard('رصيد العهدة الحالي', money(custody.balance || 0), custody.label || '');
+            if (rpAmount) addCard('الرصيد بعد التسجيل', money((Number(custody.balance || 0)) + rpAmount), 'بعد إضافة الإيراد');
+          }
         }
       }
 
@@ -1859,10 +1925,16 @@
           if (field.name === 'linkedPartnerId') visible = String(values.holderTypeCode || '').toUpperCase() === 'PARTNER';
         }
         if (moduleKey === 'recordPayment') {
-          var rpType = String(values.paymentType || '').trim().toUpperCase();
-          if (field.name === 'projectId') visible = rpType === 'PROJECT_PAYMENT';
-          if (field.name === 'internalChannelId') visible = rpType === 'INTERNAL_CHANNEL';
-          if (field.name === 'receivedCustodyAccountId') visible = !!rpType;
+          var rpCat = String(values.paymentCategory || '').trim().toUpperCase();
+          var rpSub = String(values.internalSubType || '').trim().toUpperCase();
+          if (field.name === 'paymentCategory') visible = true;
+          else if (field.name === 'projectId') visible = rpCat === 'PROJECT';
+          else if (field.name === 'internalSubType') visible = rpCat === 'INTERNAL';
+          else if (field.name === 'showroomOrderId') visible = rpCat === 'INTERNAL' && rpSub === 'SHOWROOM';
+          else if (field.name === 'factoryOrderName') visible = rpCat === 'INTERNAL' && rpSub === 'FACTORY_MACHINERY';
+          else if (field.name === 'totalOrderCost') visible = rpCat === 'INTERNAL' && rpSub === 'FACTORY_MACHINERY';
+          else if (field.name === 'amount' || field.name === 'paymentDate' || field.name === 'receivedCustodyAccountId' || field.name === 'notes') visible = !!rpCat;
+          else visible = !!rpCat;
         }
         if (visible) names.push(field.name);
       });
@@ -1913,16 +1985,7 @@
           if (field.name === 'projectId') visible = isProjectsRevenueChannel(values.revenueChannel);
           if (field.name === 'statement') visible = !!String(values.revenueChannel || '').trim();
         } else if (moduleKey === 'recordPayment') {
-          var rpType2 = String(values.paymentType || '').trim().toUpperCase();
-          if (field.name === 'clientDisplay' || field.name === 'totalReceived' || field.name === 'remainingAmount' || field.name === 'projectStatus') {
-            visible = rpType2 === 'PROJECT_PAYMENT' && !!String(values.projectId || '').trim();
-          } else if (field.name === 'channelTotal') {
-            visible = rpType2 === 'INTERNAL_CHANNEL' && !!String(values.internalChannelId || '').trim();
-          } else if (field.name === 'statement') {
-            visible = rpType2 === 'INTERNAL_CHANNEL';
-          } else {
-            visible = !!rpType2;
-          }
+          visible = false;
         } else if (moduleKey === 'projectRevenueTracking') {
           visible = !!String(values.projectId || '').trim();
         } else if (moduleKey === 'internalRevenuePayments') {
@@ -2177,6 +2240,22 @@
           if (!options.silent) denyAccessInstantly(accessError.message);
           throw accessError;
         }
+      }
+      if (moduleKey === 'recordPayment') {
+        if (!force && state.datasets[moduleKey]) return state.datasets[moduleKey];
+        var unifiedDataset = options.silent
+          ? await callServer('nijjaraGetUnifiedRevenueDataset', state.session.token)
+          : await withLoading('جارٍ تحميل سجلات الإيرادات...', function () {
+              return callServer('nijjaraGetUnifiedRevenueDataset', state.session.token);
+            });
+        if (options.commit !== false) {
+          state.datasets[moduleKey] = unifiedDataset;
+          if (!state.gridStates[moduleKey] || force) {
+            state.gridStates[moduleKey] = defaultGridState(unifiedDataset);
+          }
+          if (!options.skipRender) render();
+        }
+        return unifiedDataset;
       }
       if (isServerGridModule(moduleKey) && supportsLargeModuleCache(moduleKey) && state.largeModuleCaches[moduleKey] && state.largeModuleCaches[moduleKey].ready && state.largeModuleCaches[moduleKey].dataset) {
         if (options.commit !== false) {
@@ -2439,6 +2518,22 @@
           statement: payload.statement || ''
         };
       }
+      if (state.modalForm.moduleKey === 'recordPayment') {
+        return {
+          paymentCategory: payload.paymentCategory || (state.modalForm.values && state.modalForm.values.paymentCategory) || '',
+          projectId: payload.projectId || (state.modalForm.values && state.modalForm.values.projectId) || '',
+          internalSubType: payload.internalSubType || (state.modalForm.values && state.modalForm.values.internalSubType) || '',
+          showroomOrderId: payload.showroomOrderId || (state.modalForm.values && state.modalForm.values.showroomOrderId) || '',
+          factoryOrderName: payload.factoryOrderName || (state.modalForm.values && state.modalForm.values.factoryOrderName) || '',
+          totalOrderCost: payload.totalOrderCost || (state.modalForm.values && state.modalForm.values.totalOrderCost) || '',
+          amount: payload.amount || '',
+          paymentDate: payload.paymentDate || '',
+          receivedCustodyAccountId: payload.receivedCustodyAccountId || (state.modalForm.values && state.modalForm.values.receivedCustodyAccountId) || '',
+          notes: payload.notes || '',
+          attachmentCount: payload.attachmentCount || 0,
+          attachments: payload.attachments || []
+        };
+      }
       return payload;
     }
 
@@ -2522,9 +2617,10 @@
       delete state.largeModuleCaches[moduleKey];
       var effectiveModuleKey = moduleKey;
       if (moduleKey === 'recordPayment') {
-        var rpPaymentType = String(normalized.paymentType || '').trim().toUpperCase();
-        effectiveModuleKey = rpPaymentType === 'PROJECT_PAYMENT' ? 'projectRevenueTracking' : 'internalRevenuePayments';
+        var rpSaveCat = String(normalized.paymentCategory || '').trim().toUpperCase();
+        effectiveModuleKey = rpSaveCat === 'PROJECT' ? 'projectRevenueTracking' : 'internalRevenuePayments';
         delete state.largeModuleCaches[effectiveModuleKey];
+        delete state.datasets['recordPayment'];
       }
       if (saveResult && saveResult.record) {
         upsertDatasetRow(effectiveModuleKey, saveResult.record);
@@ -3035,6 +3131,8 @@
         '</article>';
     }
 
+    var NO_ADD_BUTTON_MODULES = ['projectRevenueTracking', 'internalRevenuePayments'];
+
     function renderModuleWindow(windowItem) {
       if (windowItem.key === 'custody') {
         return renderCustodyWindow(windowItem);
@@ -3044,19 +3142,31 @@
       }
       var dataset = getDatasetForModule(windowItem.key);
       var moduleActions = state.bootstrap.moduleActions[windowItem.key] || {};
-        if (!dataset) {
-          return '' +
-            '<article class="workspace-window" id="window-' + e(windowItem.id) + '" data-window-key="' + e(windowItem.key) + '" style="top:' + windowItem.y + 'px;right:' + windowItem.x + 'px;width:' + windowItem.width + 'px;height:' + windowItem.height + 'px;z-index:' + windowItem.zIndex + '">' +
-              renderWindowChrome(windowItem) +
-              '<div class="workspace-window__content"><section class="module-panel"><div class="module-loading-state">جارٍ تحميل البيانات...</div></section></div><button class="workspace-window__resize" type="button" aria-label="Resize window" data-resize-window="' + e(windowItem.id) + '"></button>' +
-            '</article>';
+      if (!dataset) {
+        if (windowItem.viewType === 'unified-revenue') {
+          ensureModuleDataLoaded(windowItem.key, false, { silent: false }).catch(function () {});
         }
+        return '' +
+          '<article class="workspace-window" id="window-' + e(windowItem.id) + '" data-window-key="' + e(windowItem.key) + '" style="top:' + windowItem.y + 'px;right:' + windowItem.x + 'px;width:' + windowItem.width + 'px;height:' + windowItem.height + 'px;z-index:' + windowItem.zIndex + '">' +
+            renderWindowChrome(windowItem) +
+            '<div class="workspace-window__content"><section class="module-panel"><div class="module-loading-state">جارٍ تحميل البيانات...</div></section></div><button class="workspace-window__resize" type="button" aria-label="Resize window" data-resize-window="' + e(windowItem.id) + '"></button>' +
+          '</article>';
+      }
+      var showAddButton = moduleActions.create &&
+        formSchemaFor(windowItem.key) &&
+        NO_ADD_BUTTON_MODULES.indexOf(windowItem.key) === -1;
+      var headerAction = showAddButton
+        ? renderIconButton({ icon: 'add', tone: 'navy', compact: true, label: 'إضافة جديد', title: 'إضافة جديد', attrs: { 'data-open-form': windowItem.key } })
+        : '';
+      if (windowItem.viewType === 'unified-revenue') {
+        headerAction = renderIconButton({ icon: 'add', tone: 'navy', compact: true, label: 'تسجيل إيراد / دفعة', title: 'تسجيل إيراد جديد', attrs: { 'data-open-form': 'recordPayment' } });
+      }
       return '' +
         '<article class="workspace-window" id="window-' + e(windowItem.id) + '" data-window-key="' + e(windowItem.key) + '" style="top:' + windowItem.y + 'px;right:' + windowItem.x + 'px;width:' + windowItem.width + 'px;height:' + windowItem.height + 'px;z-index:' + windowItem.zIndex + '">' +
           renderWindowChrome(windowItem) +
           '<div class="workspace-window__content">' +
               '<section class="module-panel">' +
-                renderGridShell(windowItem.key, dataset, (moduleActions.create && formSchemaFor(windowItem.key) ? renderIconButton({ icon: 'add', tone: 'navy', compact: true, label: 'إضافة جديد', title: 'إضافة جديد', attrs: { 'data-open-form': windowItem.key } }) : '')) +
+                renderGridShell(windowItem.key, dataset, headerAction) +
               '</section>' +
             '</div><button class="workspace-window__resize" type="button" aria-label="Resize window" data-resize-window="' + e(windowItem.id) + '"></button>' +
           '</article>';
@@ -3110,6 +3220,40 @@
       if (field.type === 'select') return '<div class="field' + spanClass + '"' + marker + '><label>' + e(field.label) + '</label><select name="' + e(field.name) + '"' + (isFieldRequired(field) ? ' required' : '') + '><option value="">' + e(field.placeholder || 'اختر') + '</option>' + (field.options || []).map(function (option) { return '<option value="' + e(option) + '"' + (String(currentValue) === String(option) ? ' selected' : '') + '>' + e(optionLabel(option)) + '</option>'; }).join('') + '</select></div>';
       if (field.type === 'dynamic-select') return '<div class="field' + spanClass + '"' + marker + '><label>' + e(field.label) + '</label><select name="' + e(field.name) + '"' + (isFieldRequired(field) ? ' required' : '') + '><option value="">' + e(field.placeholder || 'اختر') + '</option>' + (getLookupOptionsForField(field, currentValue).map(function (option) { return '<option value="' + e(option.value) + '"' + (String(currentValue) === String(option.value) ? ' selected' : '') + '>' + e(option.label || option.value) + '</option>'; }).join('')) + '</select></div>';
       if (field.type === 'smart-search') return '<div class="field' + spanClass + '"' + marker + '><label>' + e(field.label) + '</label><input name="' + e(field.name) + '" value="' + e(currentValue) + '" autocomplete="off"><div class="smart-search-results" data-smart-search="' + e(field.source) + '"></div></div>';
+      if (field.type === 'rp-category') {
+        var rpCatCurrent = String(currentValue || '');
+        var rpCatOptions = [
+          { value: 'PROJECT', label: 'دفعة مشروع', desc: 'دفعة مستلمة من عميل لمشروع قائم' },
+          { value: 'INTERNAL', label: 'قناة داخلية', desc: 'إيراد من ماكينات المصنع أو معرض &Pieces' }
+        ];
+        return '<div class="field field--rp-category' + spanClass + '"' + marker + '>' +
+          '<label>' + e(field.label || 'نوع الإيراد') + '</label>' +
+          '<div class="rp-type-cards">' +
+          rpCatOptions.map(function(cat) {
+            return '<button type="button" class="rp-type-card' + (rpCatCurrent === cat.value ? ' rp-type-card--selected' : '') + '" data-rp-select-category="' + e(cat.value) + '">' +
+              '<strong>' + e(cat.label) + '</strong><small>' + e(cat.desc) + '</small>' +
+            '</button>';
+          }).join('') +
+          '<input type="hidden" name="' + e(field.name) + '" value="' + e(rpCatCurrent) + '">' +
+          '</div></div>';
+      }
+      if (field.type === 'rp-subchannel') {
+        var rpSubCurrent = String(currentValue || '');
+        var rpSubOptions = [
+          { value: 'FACTORY_MACHINERY', label: 'ماكينات المصنع', desc: 'إيراد من تشغيل ماكينة (مثل CNC) على أعمال خارجية' },
+          { value: 'SHOWROOM', label: 'معرض &Pieces', desc: 'دفعة مستلمة على طلب من المعرض' }
+        ];
+        return '<div class="field field--rp-subchannel' + spanClass + '"' + marker + '>' +
+          '<label>' + e(field.label || 'اختر القناة') + '</label>' +
+          '<div class="rp-type-cards">' +
+          rpSubOptions.map(function(ch) {
+            return '<button type="button" class="rp-type-card' + (rpSubCurrent === ch.value ? ' rp-type-card--selected' : '') + '" data-rp-select-subchannel="' + e(ch.value) + '">' +
+              '<strong>' + e(ch.label) + '</strong><small>' + e(ch.desc) + '</small>' +
+            '</button>';
+          }).join('') +
+          '<input type="hidden" name="' + e(field.name) + '" value="' + e(rpSubCurrent) + '">' +
+          '</div></div>';
+      }
       var inputType = field.type || 'text';
       var extra = '';
       if (isLikelyMobileField(field)) {
@@ -3933,6 +4077,35 @@
         } catch (error) {
           toast('error', error.message);
         }
+      });
+
+      Array.prototype.forEach.call(root.querySelectorAll('[data-rp-select-category]'), function (btn) {
+        btn.addEventListener('click', function () {
+          if (!state.modalForm) return;
+          var selected = btn.getAttribute('data-rp-select-category');
+          state.modalForm.values = Object.assign({}, state.modalForm.values || {}, {
+            paymentCategory: selected,
+            internalSubType: '',
+            projectId: '',
+            showroomOrderId: '',
+            factoryOrderName: '',
+            totalOrderCost: ''
+          });
+          render();
+        });
+      });
+      Array.prototype.forEach.call(root.querySelectorAll('[data-rp-select-subchannel]'), function (btn) {
+        btn.addEventListener('click', function () {
+          if (!state.modalForm) return;
+          var selected = btn.getAttribute('data-rp-select-subchannel');
+          state.modalForm.values = Object.assign({}, state.modalForm.values || {}, {
+            internalSubType: selected,
+            showroomOrderId: '',
+            factoryOrderName: '',
+            totalOrderCost: ''
+          });
+          render();
+        });
       });
 
       var modalFormElement = root.querySelector('#modalFormElement');

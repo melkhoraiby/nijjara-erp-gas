@@ -49,10 +49,228 @@ function nijjaraApplyProjectBudgetCascade_(projectId, newBudgetValue, revisionDa
 
 function nijjaraEnsureRevenuePaymentSchema_() {
   nijjaraEnsureSheetHeaders_('PRJ_Payments', ['CustodyAccount_ID']);
-  nijjaraEnsureSheetHeaders_('INCH_InternalChannels', ['RevChannel_ID']);
-  nijjaraEnsureSheetHeaders_('INCH_InternalRevenuePayments', ['CustodyAccount_ID']);
+  nijjaraEnsureSheetHeaders_('INCH_InternalChannels', ['RevChannel_ID', 'ShowroomOrder_ID']);
+  nijjaraEnsureSheetHeaders_('INCH_InternalRevenuePayments', ['CustodyAccount_ID', 'ShowroomOrder_ID']);
   nijjaraEnsureSheetHeaders_('FIN_RevenueChannels', ['Linked_Partner_ID']);
   nijjaraEnsureSheetHeaders_('SET_ExpenseCatalog', ['Linked_Partner_ID']);
+}
+
+function nijjaraEnsureShowroomOrdersSheet_() {
+  nijjaraEnsureSheetWithHeaders_('INCH_ShowroomOrders', [
+    'ShowroomOrder_ID', 'Order_Name_AR', 'Order_Date', 'Delivery_Date', 'Agreed_Price',
+    'Order_Status', 'Total_Received', 'Total_Remaining', 'Notes_AR',
+    'Search_Text_AR', 'Search_Text_EN', 'Is_Active', 'Attachment_Count',
+    'Created_At', 'Created_By', 'Updated_At', 'Updated_By'
+  ]);
+}
+
+function nijjaraRecalculateShowroomOrderTotals_(showroomOrderId, session) {
+  if (!String(showroomOrderId || '').trim()) return;
+  var order = nijjaraFindOne_('INCH_ShowroomOrders', function (row) {
+    return String(row.ShowroomOrder_ID || '') === String(showroomOrderId || '');
+  });
+  if (!order) return;
+  var payments = nijjaraFindMany_('INCH_InternalRevenuePayments', function (row) {
+    return String(row.ShowroomOrder_ID || '') === String(showroomOrderId || '') && nijjaraRowVisible_(row);
+  });
+  var totalReceived = payments.reduce(function (s, p) { return s + (Number(p.Payment_Amount || 0) || 0); }, 0);
+  var agreed = Number(order.Agreed_Price || 0) || 0;
+  var totalRemaining = Math.max(0, agreed - totalReceived);
+  var newStatus = totalRemaining === 0 && agreed > 0 ? 'COMPLETED' : (String(order.Order_Status || 'ACTIVE').toUpperCase() === 'CANCELLED' ? 'CANCELLED' : 'ACTIVE');
+  nijjaraUpdateByRow_('INCH_ShowroomOrders', order.__row, {
+    Total_Received: totalReceived,
+    Total_Remaining: totalRemaining,
+    Order_Status: newStatus,
+    Updated_At: nijjaraNow_(),
+    Updated_By: session.userId || session.username || ''
+  });
+}
+
+function nijjaraHandleFactoryMachineryPayment_(session, payload) {
+  // Get the factory machinery revenue channel (Using Factory Machinery)
+  var factoryRevChannel = nijjaraFindOne_('FIN_RevenueChannels', function (row) {
+    var label = String(row.RevChannel_AR || row.RevChannel_EN || '').toLowerCase();
+    return label.indexOf('مكين') !== -1 || label.indexOf('factory') !== -1 || label.indexOf('machine') !== -1;
+  });
+  var revChannelId = factoryRevChannel ? (factoryRevChannel.RevChannel_ID || '') : '';
+  var now = nijjaraNow_();
+  var orderName = payload.factoryOrderName || ('أمر ماكينات - ' + now.slice(0, 10));
+  var agreedCost = Number(payload.totalOrderCost || 0) || 0;
+  var amountReceived = Number(payload.amount || 0) || 0;
+  var paymentDate = nijjaraInputDateValue_(payload.paymentDate) || now.slice(0, 10);
+
+  // Create internal channel order
+  var channelId = nijjaraRandomId_('INCH-');
+  var orderStatus = agreedCost > 0 && amountReceived >= agreedCost ? 'COMPLETED' : (agreedCost > 0 ? 'ACTIVE' : 'ACTIVE');
+  var channelRow = {
+    InternalChannel_ID: channelId,
+    InternalChannel_AR: orderName,
+    InternalChannel_EN: orderName,
+    RevChannel_ID: revChannelId,
+    Order_Date: paymentDate,
+    Order_Price: agreedCost,
+    Order_Status: orderStatus,
+    Total_Received: amountReceived,
+    Total_Remaining: Math.max(0, agreedCost - amountReceived),
+    Is_Active: true,
+    Search_Text_AR: orderName,
+    Search_Text_EN: orderName,
+    Created_At: now,
+    Created_By: session.userId,
+    Updated_At: now,
+    Updated_By: session.userId
+  };
+  nijjaraEnsureRevenuePaymentSchema_();
+  nijjaraAppendRow_('INCH_InternalChannels', channelRow);
+
+  // Create internal revenue payment linked to this channel
+  var paymentPayload = {
+    internalChannelId: channelId,
+    paymentDate: paymentDate,
+    paymentAmount: amountReceived,
+    receivedCustodyAccountId: payload.receivedCustodyAccountId || '',
+    statement: payload.notes || orderName
+  };
+  var result = nijjaraSaveModuleRecord(session.token, 'internalRevenuePayments', paymentPayload, '');
+  NIJJARA_ROWS_CACHE_['INCH_InternalChannels'] = null;
+  nijjaraClearModuleDatasetCache_('internalChannels');
+  nijjaraClearModuleDatasetCache_('internalRevenuePayments');
+  nijjaraClearModuleDatasetCache_('recordPayment');
+  nijjaraClearBootstrapCacheForUser_(session.userId);
+  nijjaraClearSharedCaches_();
+  return result && result.success ? result : { success: true, recordId: channelId, created: true };
+}
+
+function nijjaraHandleShowroomPayment_(session, payload) {
+  var showroomOrderId = payload.showroomOrderId || '';
+  var amountReceived = Number(payload.amount || 0) || 0;
+  var paymentDate = nijjaraInputDateValue_(payload.paymentDate) || nijjaraNow_().slice(0, 10);
+
+  // Get showroom order to find revChannelId
+  nijjaraEnsureShowroomOrdersSheet_();
+  var order = nijjaraFindOne_('INCH_ShowroomOrders', function (row) {
+    return String(row.ShowroomOrder_ID || '') === String(showroomOrderId || '');
+  });
+
+  // Find the showroom revenue channel
+  var showroomRevChannel = nijjaraFindOne_('FIN_RevenueChannels', function (row) {
+    var label = String(row.RevChannel_AR || row.RevChannel_EN || '').toLowerCase();
+    return label.indexOf('pieces') !== -1 || label.indexOf('بيسز') !== -1 || label.indexOf('معرض') !== -1 || label.indexOf('showroom') !== -1;
+  });
+  var revChannelId = showroomRevChannel ? (showroomRevChannel.RevChannel_ID || '') : '';
+
+  // Find or create an INCH_InternalChannels entry for this showroom order
+  var existingChannel = nijjaraFindOne_('INCH_InternalChannels', function (row) {
+    return String(row.ShowroomOrder_ID || '') === String(showroomOrderId || '');
+  });
+  var channelId;
+  var now = nijjaraNow_();
+  if (existingChannel) {
+    channelId = existingChannel.InternalChannel_ID;
+  } else {
+    channelId = nijjaraRandomId_('INCH-');
+    var orderName = order ? (order.Order_Name_AR || showroomOrderId) : showroomOrderId;
+    var agreed = order ? (Number(order.Agreed_Price || 0) || 0) : 0;
+    nijjaraEnsureRevenuePaymentSchema_();
+    nijjaraAppendRow_('INCH_InternalChannels', {
+      InternalChannel_ID: channelId,
+      InternalChannel_AR: orderName,
+      InternalChannel_EN: orderName,
+      RevChannel_ID: revChannelId,
+      ShowroomOrder_ID: showroomOrderId,
+      Order_Date: order ? nijjaraInputDateValue_(order.Order_Date) : now.slice(0, 10),
+      Order_Price: agreed,
+      Order_Status: 'ACTIVE',
+      Total_Received: 0,
+      Total_Remaining: agreed,
+      Is_Active: true,
+      Search_Text_AR: orderName,
+      Search_Text_EN: orderName,
+      Created_At: now,
+      Created_By: session.userId,
+      Updated_At: now,
+      Updated_By: session.userId
+    });
+  }
+
+  var paymentPayload = {
+    internalChannelId: channelId,
+    paymentDate: paymentDate,
+    paymentAmount: amountReceived,
+    receivedCustodyAccountId: payload.receivedCustodyAccountId || '',
+    statement: payload.notes || ('دفعة معرض: ' + (order ? (order.Order_Name_AR || showroomOrderId) : showroomOrderId)),
+    showroomOrderId: showroomOrderId
+  };
+  var result = nijjaraSaveModuleRecord(session.token, 'internalRevenuePayments', paymentPayload, '');
+  if (showroomOrderId) {
+    nijjaraRecalculateShowroomOrderTotals_(showroomOrderId, session);
+  }
+  nijjaraClearModuleDatasetCache_('internalChannels');
+  nijjaraClearModuleDatasetCache_('internalRevenuePayments');
+  nijjaraClearModuleDatasetCache_('showroomOrders');
+  nijjaraClearModuleDatasetCache_('recordPayment');
+  nijjaraClearBootstrapCacheForUser_(session.userId);
+  nijjaraClearSharedCaches_();
+  return result && result.success ? result : { success: true, recordId: channelId, created: true };
+}
+
+// Server function to get contextual info for the unified payment form
+function nijjaraGetRecordPaymentContext(sessionToken, contextType, entityId) {
+  var session = nijjaraGetSession(sessionToken);
+  if (!session) throw new Error('Session expired.');
+  var now = nijjaraNow_();
+  if (contextType === 'project') {
+    var project = nijjaraFindOne_('PRJ_Projects', function (row) {
+      return String(row.Project_ID || '') === String(entityId || '');
+    });
+    if (!project) return {};
+    var payments = nijjaraFindMany_('PRJ_Payments', function (row) {
+      return String(row.Project_ID || '') === String(entityId || '') && nijjaraRowVisible_(row);
+    }).sort(function (a, b) {
+      return String(b.Payment_Date || '').localeCompare(String(a.Payment_Date || ''));
+    });
+    var totalReceived = payments.reduce(function (s, p) { return s + (Number(p.Payment_Amount || 0) || 0); }, 0);
+    var budget = Number(project.Project_Budget || 0) || 0;
+    var client = nijjaraFindOne_('PRJ_Clients', function (row) {
+      return String(row.Client_ID || '') === String(project.Client_ID || '');
+    });
+    return {
+      projectName: project.Project_Name_AR || '',
+      clientName: client ? (client.Client_Name_AR || '') : '',
+      budget: budget,
+      totalReceived: totalReceived,
+      remaining: Math.max(0, budget - totalReceived),
+      lastPaymentDate: payments.length ? String(payments[0].Payment_Date || '').slice(0, 10) : '',
+      paymentsCount: payments.length
+    };
+  }
+  if (contextType === 'showroomOrder') {
+    nijjaraEnsureShowroomOrdersSheet_();
+    var order = nijjaraFindOne_('INCH_ShowroomOrders', function (row) {
+      return String(row.ShowroomOrder_ID || '') === String(entityId || '');
+    });
+    if (!order) return {};
+    return {
+      orderName: order.Order_Name_AR || '',
+      orderDate: nijjaraInputDateValue_(order.Order_Date),
+      deliveryDate: nijjaraInputDateValue_(order.Delivery_Date),
+      agreedPrice: Number(order.Agreed_Price || 0) || 0,
+      totalReceived: Number(order.Total_Received || 0) || 0,
+      totalRemaining: Number(order.Total_Remaining || 0) || 0,
+      orderStatus: order.Order_Status || ''
+    };
+  }
+  if (contextType === 'custody') {
+    var account = nijjaraFindOne_('FIN_CustodyAccounts', function (row) {
+      return String(row.CustodyAccount_ID || '') === String(entityId || '');
+    });
+    if (!account) return {};
+    return {
+      accountName: account.CustodyAccount_AR || account.Linked_ID || '',
+      currentBalance: Number(account.Current_Balance || 0) || 0
+    };
+  }
+  return {};
 }
 
 // One-time setup: links REVC-0004 (CNC) to PART-001, ensures all INCH_ schema columns exist
@@ -385,8 +603,22 @@ function nijjaraSaveModuleRecord(sessionToken, moduleKey, payload, recordId) {
 
   // Route unified payment to the appropriate target module
   if (moduleKey === 'recordPayment') {
-    var rpType = String(((payload || {}).paymentType) || '').trim().toUpperCase();
-    moduleKey = rpType === 'PROJECT_PAYMENT' ? 'projectRevenueTracking' : 'internalRevenuePayments';
+    var rpCategory = String(((payload || {}).paymentCategory) || '').trim().toUpperCase();
+    if (rpCategory === 'PROJECT') {
+      moduleKey = 'projectRevenueTracking';
+      // Map new fields to expected fields
+      if (payload && !payload.paymentDate && payload.paymentDate === undefined) payload.paymentDate = payload.paymentDate || '';
+    } else if (rpCategory === 'FACTORY_MACHINERY') {
+      // Auto-create internal channel order + payment
+      return nijjaraHandleFactoryMachineryPayment_(session, payload || {});
+    } else if (rpCategory === 'SHOWROOM') {
+      // Payment against showroom order
+      return nijjaraHandleShowroomPayment_(session, payload || {});
+    } else {
+      // Legacy fallback: old paymentType field
+      var rpType = String(((payload || {}).paymentType) || '').trim().toUpperCase();
+      moduleKey = rpType === 'PROJECT_PAYMENT' ? 'projectRevenueTracking' : 'internalRevenuePayments';
+    }
     nijjaraEnsureRevenuePaymentSchema_();
   }
 
@@ -577,6 +809,9 @@ function nijjaraSaveModuleRecord(sessionToken, moduleKey, payload, recordId) {
       nijjaraApplyProjectBudgetCascade_(projectId, normalized.New_Budget || 0, normalized.Revision_Date || now, session.userId, session.username);
     }
   }
+  if (moduleKey === 'showroomOrders') {
+    nijjaraEnsureShowroomOrdersSheet_();
+  }
 
   var linkedAttachments = nijjaraSaveRecordAttachments_(spec.moduleCode, spec.subModuleCode, recordId, attachments, session);
   var attachmentPatch = {
@@ -635,6 +870,12 @@ function nijjaraDeleteModuleRecord(sessionToken, moduleKey, recordId) {
       nijjaraReverseIncomingCustodyTransaction_(existingInternalRevenueTxn, session);
     }
     nijjaraRemovePartnerRevenue_('FIN', 'INTERNAL_REVENUE', recordId);
+    // If linked to showroom order, recalculate after delete
+    var existingShowroomOrderId = existing.ShowroomOrder_ID || '';
+    if (existingShowroomOrderId) {
+      nijjaraEnsureShowroomOrdersSheet_();
+      nijjaraRecalculateShowroomOrderTotals_(existingShowroomOrderId, session);
+    }
   }
 
   var patch = {
@@ -860,6 +1101,80 @@ function nijjaraClearModuleDatasetCache_(moduleKey) {
   if (NIJJARA_RUNTIME_CACHE && NIJJARA_RUNTIME_CACHE.moduleRows) {
     NIJJARA_RUNTIME_CACHE.moduleRows = {};
   }
+}
+
+// Returns unified revenue data for the recordPayment module page
+function nijjaraGetUnifiedRevenueDataset(sessionToken) {
+  var session = nijjaraGetSession(sessionToken);
+  if (!session) throw new Error('Session expired.');
+  nijjaraGuardAccess_(session, 'recordPayment', 'view');
+  var context = nijjaraLookupContext_();
+  var rows = [];
+
+  // Project payments
+  nijjaraRows_('PRJ_Payments').forEach(function (row) {
+    if (!nijjaraRowVisible_(row)) return;
+    var project = (context.projects || {})[String(row.Project_ID || '')] || { ar: row.Project_ID || '—', en: '' };
+    var client = (context.clients || {})[String(row.Client_ID || project.clientId || '')] || { ar: '—', en: '' };
+    rows.push({
+      id: row.Prj_Payment_ID || '',
+      values: {
+        paymentDate: nijjaraInputDateValue_(row.Payment_Date),
+        sourceType: 'دفعة مشروع',
+        sourceName: nijjaraBilingualValue_(project.ar, project.en),
+        clientOrChannel: nijjaraBilingualValue_(client.ar, client.en),
+        amount: nijjaraNumberValue_(row.Payment_Amount),
+        custodyAccount: nijjaraTextValue_(((context.custodyAccounts || {})[String(row.CustodyAccount_ID || '')] || { ar: '—' }).ar),
+        status: nijjaraTextValue_(row.Project_Status || 'ACTIVE'),
+        createdAt: row.Created_At || nijjaraInputDateValue_(row.Payment_Date)
+      }
+    });
+  });
+
+  // Internal revenue payments (showroom + factory)
+  nijjaraRows_('INCH_InternalRevenuePayments').forEach(function (row) {
+    if (!nijjaraRowVisible_(row)) return;
+    var channel = (context.internalChannels || {})[String(row.InternalChannel_ID || '')] || { ar: row.InternalChannel_ID || '—', en: '' };
+    var revChannel = channel.revChannelId ? ((context.revenueChannels || {})[channel.revChannelId] || { ar: '—', en: '' }) : { ar: '—', en: '' };
+    rows.push({
+      id: row.InternalPayment_ID || '',
+      values: {
+        paymentDate: nijjaraInputDateValue_(row.Payment_Date),
+        sourceType: 'إيراد داخلي',
+        sourceName: nijjaraBilingualValue_(channel.ar, channel.en),
+        clientOrChannel: nijjaraBilingualValue_(revChannel.ar, revChannel.en),
+        amount: nijjaraNumberValue_(row.Payment_Amount),
+        custodyAccount: nijjaraTextValue_(((context.custodyAccounts || {})[String(row.CustodyAccount_ID || '')] || { ar: '—' }).ar),
+        status: nijjaraTextValue_('APPROVED'),
+        createdAt: row.Created_At || nijjaraInputDateValue_(row.Payment_Date)
+      }
+    });
+  });
+
+  rows.sort(function (a, b) {
+    return String(b.values.paymentDate || '').localeCompare(String(a.values.paymentDate || ''));
+  });
+
+  return JSON.stringify({
+    moduleKey: 'recordPayment',
+    label: 'سجل الإيرادات والدفعات',
+    pageSize: 50,
+    defaultSort: { key: 'paymentDate', dir: 'desc' },
+    columns: [
+      { key: 'paymentDate', label: 'التاريخ', type: 'date', filterType: 'date', sortable: true },
+      { key: 'sourceType', label: 'النوع', type: 'text', filterType: 'text', sortable: true },
+      { key: 'sourceName', label: 'المصدر', type: 'bilingual-name', filterType: 'text', sortable: true },
+      { key: 'clientOrChannel', label: 'العميل / القناة', type: 'bilingual-name', filterType: 'text', sortable: true },
+      { key: 'amount', label: 'المبلغ', type: 'money', filterType: 'number', sortable: true },
+      { key: 'custodyAccount', label: 'العهدة', type: 'text', filterType: 'text', sortable: true }
+    ],
+    rows: rows,
+    totalRows: rows.length,
+    serverPaged: false,
+    canCreate: nijjaraHasAccess_(session, 'recordPayment', 'create'),
+    canEdit: false,
+    canDelete: false
+  });
 }
 
 function nijjaraClearBootstrapCacheForUser_(userId) {
@@ -2344,6 +2659,51 @@ function nijjaraModuleSpec_(moduleKey) {
         { key: 'actions', label: 'الإجراءات', type: 'view-action', filterType: 'none', sortable: false }
       ]
     }),
+    showroomOrders: {
+      sheetName: 'INCH_ShowroomOrders',
+      idField: 'ShowroomOrder_ID',
+      idPrefix: 'SHO-',
+      moduleCode: 'FIN',
+      subModuleCode: 'SHOWROOM_ORDERS',
+      entityLabelAr: 'طلب معرض',
+      label: 'Showroom Orders',
+      defaultSort: { key: 'orderDate', dir: 'desc' },
+      columns: [
+        { key: 'orderName', label: 'اسم الطلب', type: 'text', filterType: 'text', sortable: true },
+        { key: 'orderDate', label: 'تاريخ الطلب', type: 'date', filterType: 'date', sortable: true },
+        { key: 'deliveryDate', label: 'تاريخ التسليم', type: 'date', filterType: 'date', sortable: true },
+        { key: 'agreedPrice', label: 'القيمة المتفق عليها', type: 'money', filterType: 'number', sortable: true },
+        { key: 'totalReceived', label: 'إجمالي المستلم', type: 'money', filterType: 'number', sortable: true },
+        { key: 'totalRemaining', label: 'المتبقي', type: 'money', filterType: 'number', sortable: true },
+        { key: 'orderStatus', label: 'الحالة', type: 'text', filterType: 'text', sortable: true },
+        { key: 'actions', label: 'الإجراءات', type: 'actions', filterType: 'none', sortable: false }
+      ],
+      rowBuilder: function (row) {
+        return {
+          id: row.ShowroomOrder_ID,
+          values: {
+            orderName: nijjaraTextValue_(row.Order_Name_AR),
+            orderDate: nijjaraInputDateValue_(row.Order_Date),
+            deliveryDate: nijjaraInputDateValue_(row.Delivery_Date),
+            agreedPrice: nijjaraNumberValue_(row.Agreed_Price),
+            totalReceived: nijjaraNumberValue_(row.Total_Received),
+            totalRemaining: nijjaraNumberValue_(row.Total_Remaining),
+            orderStatus: nijjaraTextValue_(row.Order_Status),
+            createdAt: row.Created_At || ''
+          },
+          formValues: {
+            orderName: row.Order_Name_AR || '',
+            orderDate: nijjaraInputDateValue_(row.Order_Date),
+            deliveryDate: nijjaraInputDateValue_(row.Delivery_Date),
+            agreedPrice: row.Agreed_Price || '',
+            orderStatus: row.Order_Status || 'ACTIVE',
+            totalReceived: row.Total_Received || '',
+            totalRemaining: row.Total_Remaining || '',
+            notes: row.Notes_AR || ''
+          }
+        };
+      }
+    },
     auditLogs: {
       sheetName: 'SYS_AuditLog',
       idField: 'Audit_ID',
@@ -2547,6 +2907,7 @@ function nijjaraNormalizePayloadForModule_(moduleKey, payload) {
       Payment_Date: nijjaraInputDateValue_(payload.paymentDate || payload.date),
       Payment_Amount: Number(payload.paymentAmount || payload.amount || 0) || 0,
       CustodyAccount_ID: payload.receivedCustodyAccountId || '',
+      ShowroomOrder_ID: payload.showroomOrderId || '',
       Total_Received: Number(payload.totalReceived || 0) || 0,
       Total_Remaining: Number(payload.totalRemaining || 0) || 0,
       Notes: payload.statement || '',
@@ -2581,6 +2942,24 @@ function nijjaraNormalizePayloadForModule_(moduleKey, payload) {
       Is_Active: String(payload.statusCode || 'ACTIVE').toUpperCase() === 'ACTIVE',
       Search_Text_AR: [payload.arabicName].join(' | '),
       Search_Text_EN: [payload.englishName].join(' | ')
+    };
+  }
+  if (moduleKey === 'showroomOrders') {
+    var agreedPrice = Number(payload.agreedPrice || 0) || 0;
+    var totalReceived = Number(payload.totalReceived || 0) || 0;
+    var totalRemaining = Math.max(0, agreedPrice - totalReceived);
+    return {
+      Order_Name_AR: payload.orderName || '',
+      Order_Date: nijjaraInputDateValue_(payload.orderDate),
+      Delivery_Date: nijjaraInputDateValue_(payload.deliveryDate),
+      Agreed_Price: agreedPrice,
+      Order_Status: payload.orderStatus || 'ACTIVE',
+      Total_Received: totalReceived,
+      Total_Remaining: totalRemaining,
+      Notes_AR: payload.notes || '',
+      Is_Active: String(payload.orderStatus || 'ACTIVE').toUpperCase() !== 'CANCELLED',
+      Search_Text_AR: [payload.orderName].join(' | '),
+      Search_Text_EN: [payload.orderName].join(' | ')
     };
   }
   return payload || {};

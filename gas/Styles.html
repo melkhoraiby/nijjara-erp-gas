@@ -1278,6 +1278,57 @@
     font-size: .75rem;
   }
 
+  .rp-type-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .65rem;
+  }
+
+  .rp-type-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .3rem;
+    padding: .75rem 1rem;
+    border-radius: .75rem;
+    border: 1.5px solid rgba(229,226,227,.1);
+    background: rgba(0,0,0,.18);
+    cursor: pointer;
+    text-align: right;
+    transition: border-color .15s, background .15s;
+    width: 100%;
+  }
+
+  .rp-type-card strong {
+    font-size: .9rem;
+    color: rgba(229,226,227,.92);
+  }
+
+  .rp-type-card small {
+    font-size: .78rem;
+    color: rgba(196,198,204,.6);
+    line-height: 1.4;
+  }
+
+  .rp-type-card:hover {
+    border-color: rgba(233,193,118,.35);
+    background: rgba(233,193,118,.06);
+  }
+
+  .rp-type-card--selected {
+    border-color: rgba(233,193,118,.65);
+    background: rgba(233,193,118,.12);
+  }
+
+  .rp-type-card--selected strong {
+    color: rgba(233,193,118,.95);
+  }
+
+  .field--rp-category,
+  .field--rp-subchannel {
+    grid-column: 1 / -1;
+  }
+
   .field--access-matrix .access-matrix {
     display: grid;
     gap: .55rem;

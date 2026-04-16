@@ -284,6 +284,50 @@ function nijjaraBuildLookupSubset_(sources) {
       });
       return;
     }
+    if (source === 'activeShowroomOrders') {
+      subset.activeShowroomOrders = nijjaraRows_('INCH_ShowroomOrders').filter(function (row) {
+        return nijjaraRowVisible_(row) && String(row.Order_Status || 'ACTIVE').toUpperCase() === 'ACTIVE';
+      }).map(function (row) {
+        return {
+          value: row.ShowroomOrder_ID,
+          label: row.Order_Name_AR || row.ShowroomOrder_ID,
+          sublabel: row.Order_Date ? String(row.Order_Date).slice(0, 10) : '',
+          agreedPrice: Number(row.Agreed_Price || 0) || 0,
+          totalReceived: Number(row.Total_Received || 0) || 0,
+          totalRemaining: Number(row.Total_Remaining || 0) || 0
+        };
+      });
+      return;
+    }
+    if (source === 'activeProjects') {
+      subset.activeProjects = nijjaraRows_('PRJ_Projects').filter(function (row) {
+        var status = String(row.Project_Status || '').toUpperCase();
+        return nijjaraRowVisible_(row) && status !== 'COMPLETED' && status !== 'CANCELLED' && status !== 'مكتمل' && status !== 'ملغي';
+      }).map(function (row) {
+        var clientRows = nijjaraRows_('PRJ_Clients');
+        var client = clientRows.filter(function (c) { return String(c.Client_ID || '') === String(row.Client_ID || ''); })[0];
+        var payments = nijjaraRows_('PRJ_Payments').filter(function (p) {
+          return String(p.Project_ID || '') === String(row.Project_ID || '') && nijjaraRowVisible_(p);
+        });
+        var totalReceived = payments.reduce(function (s, p) { return s + (Number(p.Payment_Amount || 0) || 0); }, 0);
+        var lastPayment = payments.sort(function (a, b) {
+          return String(b.Payment_Date || '').localeCompare(String(a.Payment_Date || ''));
+        })[0];
+        var budget = Number(row.Project_Budget || 0) || 0;
+        return {
+          value: row.Project_ID,
+          label: row.Project_Name_AR || row.Project_ID,
+          sublabel: client ? (client.Client_Name_AR || '') : '',
+          clientId: row.Client_ID || '',
+          budget: budget,
+          received: totalReceived,
+          remaining: Math.max(0, budget - totalReceived),
+          lastPaymentDate: lastPayment ? String(lastPayment.Payment_Date || '').slice(0, 10) : '',
+          projectStatus: row.Project_Status || ''
+        };
+      });
+      return;
+    }
     if (source === 'manageableRoles' || source === 'roles') {
       subset[source] = nijjaraRoleOptions_();
       return;

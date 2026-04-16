@@ -60,15 +60,16 @@ var NIJJARA_NAVIGATION = Object.freeze([
     key: 'finance',
     label: 'المالية',
     items: [
-      { key: 'recordPayment', label: 'تسجيل دفعة / إيراد', module: 'FIN', viewType: 'info' },
+      { key: 'recordPayment', label: 'سجل الإيرادات والدفعات', module: 'FIN', viewType: 'unified-revenue' },
       { key: 'expenses', label: 'المصروفات', module: 'FIN', viewType: 'grid' },
       {
         key: 'revenue',
-        label: 'سجل الإيرادات',
+        label: 'سجلات الإيرادات (للمراجعة)',
         items: [
           { key: 'projectRevenueTracking', label: 'دفعات المشاريع', module: 'FIN', viewType: 'grid' },
-          { key: 'internalChannels', label: 'القنوات الداخلية', module: 'FIN', viewType: 'grid' },
-          { key: 'internalRevenuePayments', label: 'دفعات الإيرادات الداخلية', module: 'FIN', viewType: 'grid' }
+          { key: 'internalChannels', label: 'أوامر القنوات الداخلية', module: 'FIN', viewType: 'grid' },
+          { key: 'internalRevenuePayments', label: 'دفعات الإيرادات الداخلية', module: 'FIN', viewType: 'grid' },
+          { key: 'showroomOrders', label: 'طلبات معرض &Pieces', module: 'FIN', viewType: 'grid' }
         ]
       },
       { key: 'revenueChannels', label: 'قنوات الإيراد', module: 'FIN', viewType: 'grid' },
@@ -369,29 +370,48 @@ var NIJJARA_FORM_SCHEMAS = Object.freeze({
     ]
   },
   recordPayment: {
-    titleNew: 'تسجيل دفعة أو إيراد',
-    titleEdit: 'تعديل دفعة أو إيراد',
+    titleNew: 'تسجيل دفعة / إيراد',
+    titleEdit: 'تسجيل دفعة / إيراد',
     leftInfoTitle: 'معلومات السجل',
     mainTitle: 'بيانات الدفعة أو الإيراد',
-    dynamicTitle: 'بيانات محسوبة',
-    attachmentTitle: false,
-    summaryFields: ['نوع الدخل', 'التاريخ', 'المبلغ', 'المشروع / القناة', 'استلمت في عهدة'],
-    summaryFieldKeys: ['paymentType', 'date', 'amount', 'projectId', 'receivedCustodyAccountId'],
+    dynamicTitle: 'بيانات إضافية',
+    attachmentTitle: 'المرفقات',
+    summaryFields: ['نوع الإيراد', 'التاريخ', 'المبلغ', 'المشروع / القناة', 'استلمت في عهدة', 'ملاحظات'],
+    summaryFieldKeys: ['paymentCategory', 'paymentDate', 'amount', 'sourceLabel', 'custodyLabel', 'notes'],
     mainFields: [
-      { name: 'paymentType', label: 'نوع الدخل', type: 'select', options: ['PROJECT_PAYMENT', 'INTERNAL_CHANNEL'], required: true, placeholder: 'اختر نوع الدخل' },
-      { name: 'date', label: 'التاريخ', type: 'date', required: true },
-      { name: 'amount', label: 'المبلغ', type: 'number', required: true },
-      { name: 'projectId', label: 'المشروع', type: 'dynamic-select', source: 'projects', placeholder: 'اختر المشروع' },
-      { name: 'internalChannelId', label: 'القناة الداخلية', type: 'dynamic-select', source: 'internalChannels', placeholder: 'اختر القناة الداخلية' },
-      { name: 'receivedCustodyAccountId', label: 'استلمت في عهدة', type: 'dynamic-select', source: 'custodyAccounts', placeholder: 'اختر العهدة المستلمة' }
+      { name: 'paymentCategory', label: 'نوع الإيراد', type: 'rp-category', required: true },
+      { name: 'projectId', label: 'المشروع', type: 'dynamic-select', source: 'activeProjects', required: true, placeholder: 'اختر المشروع' },
+      { name: 'internalSubType', label: 'القناة الداخلية', type: 'rp-subchannel', required: true },
+      { name: 'showroomOrderId', label: 'طلب المعرض', type: 'dynamic-select', source: 'activeShowroomOrders', required: true, placeholder: 'اختر طلب المعرض' },
+      { name: 'factoryOrderName', label: 'اسم الأمر / الطلب', type: 'text', required: true, placeholder: 'أدخل اسماً للأمر' },
+      { name: 'totalOrderCost', label: 'إجمالي تكلفة الأمر', type: 'number', placeholder: 'التكلفة الكاملة المتفق عليها' },
+      { name: 'amount', label: 'المبلغ المستلم', type: 'number', required: true },
+      { name: 'paymentDate', label: 'التاريخ', type: 'date', required: true },
+      { name: 'receivedCustodyAccountId', label: 'استلمت في عهدة', type: 'dynamic-select', source: 'custodyAccounts', required: true, placeholder: 'اختر العهدة' },
+      { name: 'notes', label: 'ملاحظات', type: 'textarea' }
+    ],
+    dynamicFields: []
+  },
+  showroomOrders: {
+    titleNew: 'إضافة طلب معرض &Pieces',
+    titleEdit: 'تعديل طلب معرض &Pieces',
+    leftInfoTitle: 'معلومات الطلب',
+    mainTitle: 'بيانات الطلب',
+    dynamicTitle: 'بيانات الأرصدة',
+    attachmentTitle: 'المرفقات',
+    summaryFields: ['اسم الطلب', 'تاريخ الطلب', 'تاريخ التسليم', 'القيمة المتفق عليها', 'الحالة', 'المرفقات'],
+    summaryFieldKeys: ['orderName', 'orderDate', 'deliveryDate', 'agreedPrice', 'orderStatus', 'attachments'],
+    mainFields: [
+      { name: 'orderName', label: 'اسم الطلب', type: 'text', required: true, placeholder: 'أدخل اسماً مميزاً للطلب' },
+      { name: 'orderDate', label: 'تاريخ الطلب', type: 'date', required: true },
+      { name: 'deliveryDate', label: 'تاريخ التسليم المتفق عليه', type: 'date' },
+      { name: 'agreedPrice', label: 'القيمة المتفق عليها', type: 'number', required: true }
     ],
     dynamicFields: [
-      { name: 'clientDisplay', label: 'العميل', type: 'derived' },
+      { name: 'orderStatus', label: 'حالة الطلب', type: 'select', options: ['ACTIVE', 'COMPLETED', 'CANCELLED'], placeholder: 'اختر الحالة' },
       { name: 'totalReceived', label: 'إجمالي المستلم', type: 'derived' },
-      { name: 'remainingAmount', label: 'المتبقي', type: 'derived' },
-      { name: 'projectStatus', label: 'الحالة', type: 'derived' },
-      { name: 'channelTotal', label: 'إجمالي القناة', type: 'derived' },
-      { name: 'statement', label: 'الوصف', type: 'textarea' }
+      { name: 'totalRemaining', label: 'المتبقي', type: 'derived' },
+      { name: 'notes', label: 'ملاحظات', type: 'textarea' }
     ]
   },
   revenueChannels: {

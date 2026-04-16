@@ -48,6 +48,7 @@ function nijjaraApplyProjectBudgetCascade_(projectId, newBudgetValue, revisionDa
 }
 
 function nijjaraEnsureRevenuePaymentSchema_() {
+  nijjaraEnsureShowroomOrdersSheet_();
   nijjaraEnsureSheetHeaders_('PRJ_Payments', ['CustodyAccount_ID']);
   nijjaraEnsureSheetHeaders_('INCH_InternalChannels', ['RevChannel_ID', 'ShowroomOrder_ID']);
   nijjaraEnsureSheetHeaders_('INCH_InternalRevenuePayments', ['CustodyAccount_ID', 'ShowroomOrder_ID']);
@@ -629,7 +630,7 @@ function nijjaraSaveModuleRecord(sessionToken, moduleKey, payload, recordId) {
 
   var rawPayload = payload || {};
   var attachments = nijjaraNormalizeAttachmentPayload_(rawPayload.attachments);
-  if (moduleKey === 'projectRevenueTracking' || moduleKey === 'collections' || moduleKey === 'internalRevenuePayments') {
+  if (moduleKey === 'projectRevenueTracking' || moduleKey === 'collections' || moduleKey === 'internalRevenuePayments' || moduleKey === 'showroomOrders') {
     nijjaraEnsureRevenuePaymentSchema_();
   }
   var normalized = nijjaraNormalizePayloadForModule_(moduleKey, rawPayload);

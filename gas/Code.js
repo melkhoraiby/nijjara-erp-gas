@@ -10,6 +10,11 @@ function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
+function nijjaraRunOneTimeSetup() {
+  nijjaraEnsureRevenuePaymentSchema_();
+  return { done: true, timestamp: new Date().toISOString() };
+}
+
 function nijjaraSeedProjectBudgetRevisionBaselines() {
   var now = nijjaraNow_();
   var existingByProject = {};
